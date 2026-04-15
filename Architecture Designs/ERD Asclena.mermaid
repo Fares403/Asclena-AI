@@ -1,0 +1,352 @@
+        %%{init: {'theme': 'base', 'themeVariables': {
+        'background': '#F8FAFC',
+        'primaryColor': '#E3F2FD',
+        'primaryTextColor': '#0F172A',
+        'primaryBorderColor': '#1E88E5',
+        'lineColor': '#334155',
+        'secondaryColor': '#E8F5E9',
+        'tertiaryColor': '#FFF3E0'
+    }}}%%
+erDiagram
+
+    %% ══════════════════════════════════════════════
+    %% AUTH & USER DOMAIN
+    %% ══════════════════════════════════════════════
+
+    User {
+        bigint      user_id         PK
+        varchar     first_name
+        varchar     last_name
+        varchar     email
+        varchar     password
+        varchar     phone
+        boolean     is_active
+        datetime    created_at
+    }
+
+    Role {
+        bigint      role_id         PK
+        varchar     role_name
+    }
+
+    UserRole {
+        bigint      user_id         PK,FK
+        bigint      role_id         PK,FK
+        datetime    assigned_at
+    }
+
+    Permission {
+        bigint      permission_id   PK
+        varchar     code
+    }
+
+    RolePermission {
+        bigint      role_id         PK,FK
+        bigint      permission_id   PK,FK
+    }
+
+    Screen {
+        bigint      screen_id               PK
+        varchar     code
+        varchar     path
+        varchar     module
+        bigint      required_permission_id  FK
+        boolean     is_active
+    }
+
+    AuditLog {
+        bigint      audit_log_id    PK
+        bigint      user_id         FK
+        varchar     action
+        varchar     entity_type
+        bigint      entity_id
+        datetime    created_at
+    }
+
+    %% ══════════════════════════════════════════════
+    %% STAFF PROFILES
+    %% ══════════════════════════════════════════════
+
+    Doctor {
+        bigint      doctor_id           PK,FK
+        varchar     specialty
+        varchar     license_number
+    }
+
+    LabStaff {
+        bigint      lab_staff_id        PK,FK
+        varchar     lab_department
+    }
+
+    RadiologyStaff {
+        bigint      radiology_staff_id  PK,FK
+        varchar     imaging_department
+    }
+
+    Receptionist {
+        bigint      receptionist_id     PK,FK
+    }
+
+    %% ══════════════════════════════════════════════
+    %% PATIENT DOMAIN
+    %% ══════════════════════════════════════════════
+
+    Patient {
+        bigint      patient_id              PK
+        varchar     mrn
+        varchar     first_name
+        varchar     last_name
+        varchar     national_id
+        date        dob
+        varchar     gender
+        varchar     phone
+        varchar     email
+        varchar     address
+        varchar     blood_type
+        decimal     initial_weight
+        decimal     initial_height
+        decimal     initial_BMI
+        varchar     initial_blood_pressure
+    }
+
+    PatientInsurance {
+        bigint      insurance_id    PK
+        bigint      patient_id      FK
+        varchar     company
+        varchar     policy_number
+        varchar     class
+        date        expiry_date
+        boolean     is_active
+    }
+
+    PatientEmergencyContact {
+        bigint      contact_id      PK
+        bigint      patient_id      FK
+        varchar     name
+        varchar     relationship
+        varchar     phone
+        boolean     is_primary
+        datetime    created_at
+    }
+
+    PatientAllergy {
+        bigint      allergy_id      PK
+        bigint      patient_id      FK
+        varchar     allergen
+        varchar     severity
+        varchar     reaction
+        boolean     is_active
+    }
+
+    %% ══════════════════════════════════════════════
+    %% CASE & EPISODE DOMAIN
+    %% ══════════════════════════════════════════════
+
+    CaseRecord {
+        bigint      case_id             PK
+        bigint      patient_id          FK
+        varchar     primary_diagnosis
+        date        start_date
+        date        end_date
+        boolean     is_active
+        decimal     risk_score
+        varchar     risk_level
+        text        summary
+    }
+
+    Episode {
+        bigint      episode_id      PK
+        bigint      case_id         FK
+        date        start_date
+        date        end_date
+        varchar     status
+    }
+
+    EpisodeClinicalNote {
+        bigint      note_id         PK
+        bigint      episode_id      FK
+        varchar     note_type
+        text        content
+        bigint      created_by      FK
+        datetime    created_at
+    }
+
+    %% ══════════════════════════════════════════════
+    %% VITALS DOMAIN
+    %% ══════════════════════════════════════════════
+
+    VitalType {
+        bigint      vital_type_id   PK
+        varchar     code
+        varchar     name
+    }
+
+    Unit {
+        bigint      unit_id         PK
+        varchar     code
+        varchar     name
+    }
+
+    VitalSign {
+        bigint      measurement_id  PK
+        bigint      episode_id      FK
+        bigint      vital_type_id   FK
+        decimal     value
+        bigint      unit_id         FK
+        datetime    measured_at
+        bigint      recorded_by     FK
+    }
+
+    %% ══════════════════════════════════════════════
+    %% LAB DOMAIN
+    %% ══════════════════════════════════════════════
+
+    LabOrder {
+        bigint      lab_order_id    PK
+        bigint      episode_id      FK
+        bigint      ordered_by      FK
+        datetime    order_date
+        varchar     status
+        varchar     priority
+    }
+
+    LabResult {
+        bigint      lab_result_id   PK
+        bigint      lab_order_id    FK
+        varchar     status
+        bigint      reviewed_by     FK
+        datetime    reviewed_at
+    }
+
+    LabResultItem {
+        bigint      lab_result_item_id  PK
+        bigint      lab_result_id       FK
+        varchar     analyte_code
+        varchar     value
+        varchar     unit
+        varchar     reference_range_text
+        varchar     flag
+    }
+
+    %% ══════════════════════════════════════════════
+    %% IMAGING DOMAIN
+    %% ══════════════════════════════════════════════
+
+    ImagingOrder {
+        bigint      imaging_order_id    PK
+        bigint      episode_id          FK
+        bigint      ordered_by          FK
+        varchar     modality
+        varchar     body_part
+        varchar     status
+        datetime    order_date
+    }
+
+    ImagingResult {
+        bigint      imaging_result_id   PK
+        bigint      imaging_order_id    FK
+        text        findings
+        text        conclusion
+        text        report_text
+        bigint      reviewed_by         FK
+        datetime    reviewed_at
+    }
+
+    %% ══════════════════════════════════════════════
+    %% PRESCRIPTION DOMAIN
+    %% ══════════════════════════════════════════════
+
+    Medication {
+        bigint      medication_id   PK
+        varchar     name
+    }
+
+    Prescription {
+        bigint      prescription_id PK
+        bigint      episode_id      FK
+        bigint      medication_id   FK
+        varchar     dose
+        varchar     frequency
+        varchar     duration
+        varchar     status
+        bigint      prescribed_by   FK
+        datetime    start_date
+        datetime    end_date
+    }
+
+    %% ══════════════════════════════════════════════
+    %% APPOINTMENT DOMAIN
+    %% ══════════════════════════════════════════════
+
+    Appointment {
+        bigint      appointment_id      PK
+        bigint      patient_id          FK
+        bigint      doctor_id           FK
+        bigint      receptionist_id     FK
+        datetime    scheduled_date_time
+        varchar     status
+        datetime    check_in_time
+        datetime    start_time
+        datetime    end_time
+        datetime    created_at
+    }
+
+    %% ══════════════════════════════════════════════
+    %% RELATIONSHIPS
+    %% ══════════════════════════════════════════════
+
+    %% Auth & Roles
+    User            ||--o{    UserRole                : "assigned to"
+    Role            ||--o{    UserRole                : "assigned to"
+    Role            ||--o{    RolePermission          : "grants"
+    Permission      ||--o{    RolePermission          : "included in"
+    Permission      ||--o{    Screen                  : "required for"
+    User            ||--o{    AuditLog                : "generates"
+
+    %% Staff Profiles (extend User)
+    User            ||--o|    Doctor                  : "profile"
+    User            ||--o|    LabStaff                : "profile"
+    User            ||--o|    RadiologyStaff          : "profile"
+    User            ||--o|    Receptionist            : "profile"
+
+    %% Patient relationships
+    Patient         ||--o{    PatientInsurance        : "has"
+    Patient         ||--o{    PatientEmergencyContact : "has"
+    Patient         ||--o{    PatientAllergy          : "has"
+    Patient         ||--o{    CaseRecord              : "has"
+    Patient         ||--o{    Appointment             : "books"
+
+    %% Case & Episode
+    CaseRecord      ||--o{    Episode                 : "contains"
+    Episode         ||--o{    EpisodeClinicalNote     : "has"
+
+    %% Vitals
+    Episode         ||--o{    VitalSign               : "records"
+    VitalType       ||--o{    VitalSign               : "defines"
+    Unit            ||--o{    VitalSign               : "uses"
+    User            ||--o{    VitalSign               : "recorded by"
+
+    %% Lab
+    Episode         ||--o{    LabOrder                : "orders"
+    Doctor          ||--o{    LabOrder                : "ordered by"
+    LabOrder        ||--o|    LabResult               : "produces"
+    LabResult       ||--o{    LabResultItem           : "contains"
+    LabStaff        ||--o{    LabResult               : "reviews"
+
+    %% Imaging
+    Episode         ||--o{    ImagingOrder            : "orders"
+    Doctor          ||--o{    ImagingOrder            : "ordered by"
+    ImagingOrder    ||--o|    ImagingResult           : "produces"
+    RadiologyStaff  ||--o{    ImagingResult           : "reviews"
+
+    %% Prescriptions
+    Episode         ||--o{    Prescription            : "includes"
+    Medication      ||--o{    Prescription            : "used in"
+    Doctor          ||--o{    Prescription            : "prescribes"
+
+    %% Appointments
+    Doctor          ||--o{    Appointment             : "sees"
+    Receptionist    ||--o{    Appointment             : "manages"
+
+    %% Clinical Notes
+    User            ||--o{    EpisodeClinicalNote     : "created by"

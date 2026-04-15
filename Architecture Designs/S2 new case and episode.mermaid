@@ -1,0 +1,19 @@
+        %%{init: {'theme': 'base', 'themeVariables': {
+        'background': '#F8FAFC',
+        'primaryColor': '#E3F2FD',
+        'primaryTextColor': '#0F172A',
+        'primaryBorderColor': '#1E88E5',
+        'lineColor': '#334155',
+        'secondaryColor': '#E8F5E9',
+        'tertiaryColor': '#FFF3E0'
+    }}}%%
+sequenceDiagram
+    actor Patient
+    participant Doctor
+    participant CaseRecord
+    participant Episode
+
+    Patient->>Doctor: Present new problem
+    Doctor->>CaseRecord: Open new Case
+    Note over CaseRecord,Episode: Episode is created within the newly opened Case
+    CaseRecord->>Episode: Open new Episode within Case

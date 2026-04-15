@@ -1,0 +1,22 @@
+        %%{init: {'theme': 'base', 'themeVariables': {
+        'background': '#F8FAFC',
+        'primaryColor': '#E3F2FD',
+        'primaryTextColor': '#0F172A',
+        'primaryBorderColor': '#1E88E5',
+        'lineColor': '#334155',
+        'secondaryColor': '#E8F5E9',
+        'tertiaryColor': '#FFF3E0'
+    }}}%%
+sequenceDiagram
+    actor Patient
+    participant Receptionist
+    participant Nurse
+    participant Episode
+    participant VitalSign
+
+    Patient->>Receptionist: Check-in
+    Receptionist->>Nurse: Notify patient ready for vitals
+    Nurse->>Nurse: Measure vital signs
+    Note over Episode,VitalSign: VitalSign measurements are persisted and linked to the active Episode
+    Nurse->>VitalSign: Associate with Episode
+    VitalSign->>Episode: Linked

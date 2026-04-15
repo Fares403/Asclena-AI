@@ -1,0 +1,160 @@
+        %%{init: {'theme': 'base', 'themeVariables': {
+        'background': '#F8FAFC',
+        'primaryColor': '#E3F2FD',
+        'primaryTextColor': '#0F172A',
+        'primaryBorderColor': '#1E88E5',
+        'lineColor': '#334155',
+        'secondaryColor': '#E8F5E9',
+        'tertiaryColor': '#FFF3E0'
+    }}}%%
+
+    stateDiagram-v2
+        direction TB
+
+        %% ───────────── STYLE DEFINITIONS ─────────────
+        classDef clinical fill:#E3F2FD,stroke:#1E88E5,stroke-width:2px;
+        classDef ai fill:#E8F5E9,stroke:#43A047,stroke-width:2px;
+        classDef system fill:#FFF3E0,stroke:#FB8C00,stroke-width:2px;
+        classDef decision fill:#FCE4EC,stroke:#D81B60,stroke-width:2px;
+
+        [*] --> PatientArrival : Patient Arrives
+
+        %% ───────────────── CLINICAL ENCOUNTER ─────────────────
+        state "Clinical Encounter" as CE {
+            PatientArrival --> CaseIntake : Register / Identify Patient
+
+            CaseIntake --> NewCase      : No Existing Record
+            CaseIntake --> ExistingCase : Retrieve Case
+
+            NewCase --> EpisodeStart : Create Case
+            ExistingCase --> EpisodeStart : Continue Case
+
+            EpisodeStart --> RecordingVitals : Nurse Measures Vitals
+        }
+
+        RecordingVitals --> DoctorExam : Send Clinical Data
+
+        %% ───────────────── DECISION LAYER ─────────────────
+        state "Clinical Decision Layer" as CDL {
+
+            DoctorExam --> OrderLab : Request Lab Test
+            DoctorExam --> OrderImaging : Request Scan
+            DoctorExam --> AskAI : Query AI Assistant
+
+            %% ───────────── LAB PIPELINE ─────────────
+            state "Lab Pipeline" as LAB {
+                OrderLab --> SampleCollection : Collect Sample
+                SampleCollection --> LabProcessing : Prepare Sample
+
+                LabProcessing --> LabAIInference : Send Task to Queue
+
+                LabAIInference --> LabDraftReport : AI Generates Draft
+
+                LabDraftReport --> LabValidation : Human Review
+
+                LabValidation --> LabApproved : Valid Data
+                LabValidation --> LabRejected : Invalid Data
+
+                LabRejected --> SampleCollection : Retest Required
+
+                LabApproved --> LabFinalReport : Final Report
+            }
+
+            %% ───────────── IMAGING PIPELINE ─────────────
+            state "Imaging Pipeline" as IMG {
+                OrderImaging --> ImageAcquisition : Capture Image
+                ImageAcquisition --> ImagingProcessing : Preprocess Image
+
+                ImagingProcessing --> ImagingAIInference : Send Task to Queue
+
+                ImagingAIInference --> ImagingDraftReport : AI Generates Draft
+
+                ImagingDraftReport --> ImagingValidation : Radiologist Review
+
+                ImagingValidation --> ImagingApproved : Valid Image
+                ImagingValidation --> ImagingRejected : Poor Quality
+
+                ImagingRejected --> ImageAcquisition : Retake Required
+
+                ImagingApproved --> ImagingFinalReport : Final Report
+            }
+
+            %% ───────────── AI CONSULTATION ─────────────
+            state "AI Consultation (Agentic RAG)" as AI {
+
+                AskAI --> ClaimExtraction : Extract Claims from Input
+
+                ClaimExtraction --> MultiModalFusion : Combine CNN + VLM
+
+                MultiModalFusion --> EvidenceRetrieval : Query Vector DB
+
+                EvidenceRetrieval --> EvidenceEvaluation : Validate Evidence
+
+                EvidenceEvaluation --> AIConfirmed     : Strong Evidence
+                EvidenceEvaluation --> AIUncertain     : Weak Evidence
+                EvidenceEvaluation --> AIDeferred      : No Evidence
+
+                AIConfirmed --> AIResponse : Generate Verified Output
+                AIUncertain --> AIResponse : Add Uncertainty
+                AIDeferred  --> AIResponse : Defer Claim
+            }
+
+            %% ───────────── CONVERGENCE ─────────────
+            LabFinalReport --> ClinicalSynthesis : Merge Lab Data
+            ImagingFinalReport --> ClinicalSynthesis : Merge Imaging Data
+            AIResponse --> ClinicalSynthesis : Merge AI Insights
+
+            ClinicalSynthesis --> DiagnosisDecision : Evaluate All Inputs
+
+            DiagnosisDecision --> ConfirmedDiagnosis : High Confidence
+            DiagnosisDecision --> UncertainDiagnosis : Low Confidence
+        }
+
+        %% ───────────────── ACTION LAYER ─────────────────
+        ConfirmedDiagnosis --> TreatmentPlan : Prescribe Treatment
+        UncertainDiagnosis --> FurtherInvestigation : Request More Tests
+
+        FurtherInvestigation --> DoctorExam : Re-evaluate Case
+
+        TreatmentPlan --> EpisodeClosure : Complete Episode
+
+        %% ───────────────── POST EPISODE ─────────────────
+        state "Post-Episode Management" as PEM {
+            EpisodeClosure --> PatientNotification : Inform Patient
+            EpisodeClosure --> AuditLogging : Store Logs
+
+            EpisodeClosure --> CaseEvaluation : Review Outcome
+
+            CaseEvaluation --> CaseClosed : Problem Resolved
+            CaseEvaluation --> CaseActive : Follow-up Needed
+        }
+
+        CaseActive --> CaseIntake : Next Visit
+
+        %% ───────────────── SYSTEM LAYER ─────────────────
+        state "System Layer (Asclena Backend)" as SYS {
+
+            state "RabbitMQ (Task Queue)" as MQ
+            state "Redis (State Sync)" as REDIS
+            state "Object Storage" as STORAGE
+            state "PostgreSQL DB" as DB
+
+            LabAIInference --> MQ : Publish Task
+            ImagingAIInference --> MQ : Publish Task
+
+            MQ --> LabDraftReport : Consume Task (Worker)
+            MQ --> ImagingDraftReport : Consume Task (Worker)
+
+            ImagingProcessing --> STORAGE : Save Images
+            LabProcessing --> DB : Store Metadata
+
+            AIResponse --> REDIS : Update State
+            LabFinalReport --> DB : Persist Report
+            ImagingFinalReport --> DB : Persist Report
+        }
+
+        %% ───────────── APPLY COLORS ─────────────
+        class PatientArrival,CaseIntake,NewCase,ExistingCase,EpisodeStart,RecordingVitals,DoctorExam clinical
+        class OrderLab,OrderImaging,AskAI,ClinicalSynthesis decision
+        class LabAIInference,ImagingAIInference,ClaimExtraction,MultiModalFusion,EvidenceRetrieval,EvidenceEvaluation,AIResponse ai
+        class MQ,REDIS,STORAGE,DB system

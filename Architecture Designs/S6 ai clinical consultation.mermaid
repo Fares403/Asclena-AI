@@ -1,0 +1,23 @@
+        %%{init: {'theme': 'base', 'themeVariables': {
+        'background': '#F8FAFC',
+        'primaryColor': '#E3F2FD',
+        'primaryTextColor': '#0F172A',
+        'primaryBorderColor': '#1E88E5',
+        'lineColor': '#334155',
+        'secondaryColor': '#E8F5E9',
+        'tertiaryColor': '#FFF3E0'
+    }}}%%
+sequenceDiagram
+    actor Doctor
+    participant AsclenaAI as Asclena AI
+    participant CaseRecord
+    participant Episode
+    participant LabResult
+    participant ImagingResult
+
+    Doctor->>AsclenaAI: 1. Ask patient-specific questions
+    AsclenaAI->>CaseRecord: 2. Retrieve case context (episodes, summaries)
+    AsclenaAI->>Episode: 3. Retrieve active episode context (notes, vitals)
+    AsclenaAI->>LabResult: 4. Retrieve recent lab evidence
+    AsclenaAI->>ImagingResult: 5. Retrieve recent imaging evidence
+    AsclenaAI->>Doctor: 6. Provide analysis and recommendations

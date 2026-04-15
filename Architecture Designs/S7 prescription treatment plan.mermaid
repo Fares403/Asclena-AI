@@ -1,0 +1,23 @@
+        %%{init: {'theme': 'base', 'themeVariables': {
+        'background': '#F8FAFC',
+        'primaryColor': '#E3F2FD',
+        'primaryTextColor': '#0F172A',
+        'primaryBorderColor': '#1E88E5',
+        'lineColor': '#334155',
+        'secondaryColor': '#E8F5E9',
+        'tertiaryColor': '#FFF3E0'
+    }}}%%
+sequenceDiagram
+    actor Doctor
+    participant Episode
+    participant AsclenaAI as Asclena AI
+    participant Prescription
+    actor Patient
+
+    Doctor->>Episode: 1. Review final lab & imaging reports
+    Doctor->>AsclenaAI: 2. Request treatment recommendation
+    AsclenaAI->>Doctor: 3. Suggest medications, dosage, and plan
+    Doctor->>Prescription: 4. Write prescription (medication, dose, frequency, duration)
+    Prescription->>Episode: 5. Link prescription to active Episode
+    Doctor->>Patient: 6. Explain diagnosis and treatment plan
+    Patient->>Doctor: 7. Acknowledge and confirm understanding
