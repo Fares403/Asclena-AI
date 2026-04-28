@@ -1,0 +1,7 @@
+run_id,raw_table,backup_table,raw_row_count,backup_row_count,counts_match
+20260428T194518Z,ed_stays,ed_stays_raw_backup,425087,425087,true
+20260428T194518Z,triage,triage_raw_backup,425087,425087,true
+20260428T194518Z,vital_sign,vital_sign_raw_backup,1564610,1564610,true
+20260428T194518Z,diagnosis,diagnosis_raw_backup,899050,899050,true
+20260428T194518Z,pyxis,pyxis_raw_backup,1586053,1586053,true
+20260428T194518Z,med_recon,med_recon_raw_backup,2987342,2987342,true

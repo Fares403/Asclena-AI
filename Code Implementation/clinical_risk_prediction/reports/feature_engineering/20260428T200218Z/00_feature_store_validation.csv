@@ -1,0 +1,7 @@
+run_id,check_name,value,expected_value,passes
+20260428T200218Z,matches_cleaned_ed_stays_count,425087,425087,true
+20260428T200218Z,one_row_per_stay_id,425087,425087,true
+20260428T200218Z,no_null_identifiers,0,0,true
+20260428T200218Z,no_orphan_feature_rows,0,0,true
+20260428T200218Z,no_duplicate_stay_id_groups,0,0,true
+20260428T200218Z,risk_target_not_populated_yet,0,0,true

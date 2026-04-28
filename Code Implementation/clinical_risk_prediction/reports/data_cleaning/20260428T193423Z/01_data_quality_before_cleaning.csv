@@ -1,0 +1,232 @@
+run_id,phase,table_name,column_name,metric,value_num,value_text,recommended_cleaning_action
+20260428T193423Z,before_cleaning,sampled_ed_stays,,row_count,212807.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_ed_stays,,distinct_stay_id,212807.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_ed_stays,,distinct_subject_id,127038.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_ed_stays,,duplicate_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,stay_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,stay_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,subject_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,subject_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,hadm_id,null_count,111099.0,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_ed_stays,hadm_id,null_percentage,52.2065,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_ed_stays,intime,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,intime,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,outtime,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,outtime,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,gender,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,gender,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,race,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,race,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,arrival_transport,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,arrival_transport,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,disposition,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,disposition,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,created_at,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,created_at,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_ed_stays,stay_id,numeric_min,30000017.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_ed_stays,stay_id,numeric_max,39999965.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_ed_stays,subject_id,numeric_min,10000032.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_ed_stays,subject_id,numeric_max,19999987.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_ed_stays,hadm_id,numeric_min,20000057.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_ed_stays,hadm_id,numeric_max,29999625.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,,row_count,212807.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_triage,,distinct_stay_id,212807.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_triage,,distinct_subject_id,127038.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_triage,,duplicate_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,triage_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,triage_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,stay_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,stay_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,subject_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,subject_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,temperature,null_count,11969.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,temperature,null_percentage,5.6243,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,heartrate,null_count,8645.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,heartrate,null_percentage,4.0624,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,resprate,null_count,10279.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,resprate,null_percentage,4.8302,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,o2sat,null_count,10451.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,o2sat,null_percentage,4.911,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,sbp,null_count,9251.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,sbp,null_percentage,4.3471,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,dbp,null_count,9644.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,dbp,null_percentage,4.5318,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,pain,null_count,6513.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,pain,null_percentage,3.0605,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,acuity,null_count,3514.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,acuity,null_percentage,1.6513,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,chiefcomplaint,null_count,14.0,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,chiefcomplaint,null_percentage,0.0066,,Keep NULL vitals and add missing indicator columns.
+20260428T193423Z,before_cleaning,sampled_triage,created_at,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,created_at,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,triage_id,numeric_min,2.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,triage_id,numeric_max,425087.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,stay_id,numeric_min,30000017.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,stay_id,numeric_max,39999965.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,subject_id,numeric_min,10000032.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,subject_id,numeric_max,19999987.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,temperature,numeric_min,85.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,temperature,numeric_max,110.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,heartrate,numeric_min,25.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,heartrate,numeric_max,250.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,resprate,numeric_min,6.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,resprate,numeric_max,60.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,o2sat,numeric_min,50.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,o2sat,numeric_max,100.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,sbp,numeric_min,60.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,sbp,numeric_max,300.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,dbp,numeric_min,30.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,dbp,numeric_max,199.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,acuity,numeric_min,1.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,acuity,numeric_max,5.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_triage,temperature,invalid_clinical_count,40.0,,Set out-of-range clinical values to NULL; feature imputation happens later.
+20260428T193423Z,before_cleaning,sampled_triage,heartrate,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,resprate,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,o2sat,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,sbp,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,dbp,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_triage,acuity,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,,row_count,782552.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_vital_sign,,distinct_stay_id,204416.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_vital_sign,,distinct_subject_id,122460.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_vital_sign,,duplicate_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,vital_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,vital_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,stay_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,stay_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,subject_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,subject_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,charttime,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,charttime,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,temperature,null_count,283531.0,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,temperature,null_percentage,36.2316,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,heartrate,null_count,35397.0,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,heartrate,null_percentage,4.5233,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,resprate,null_count,45063.0,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,resprate,null_percentage,5.7585,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,o2sat,null_count,68568.0,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,o2sat,null_percentage,8.7621,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,sbp,null_count,42029.0,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,sbp,null_percentage,5.3708,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,dbp,null_count,41519.0,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,dbp,null_percentage,5.3056,,Keep clinically meaningful NULLs; remove only rows violating table cleaning rules.
+20260428T193423Z,before_cleaning,sampled_vital_sign,rhythm,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,rhythm,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,pain,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,pain,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,created_at,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,created_at,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,vital_id,numeric_min,4693838.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,vital_id,numeric_max,6258440.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,stay_id,numeric_min,30000017.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,stay_id,numeric_max,39999964.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,subject_id,numeric_min,10000032.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,subject_id,numeric_max,19999987.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,temperature,numeric_min,85.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,temperature,numeric_max,110.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,heartrate,numeric_min,25.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,heartrate,numeric_max,250.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,resprate,numeric_min,5.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,resprate,numeric_max,60.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,o2sat,numeric_min,50.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,o2sat,numeric_max,100.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,sbp,numeric_min,60.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,sbp,numeric_max,299.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,dbp,numeric_min,30.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,dbp,numeric_max,200.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_vital_sign,temperature,invalid_clinical_count,103.0,,Set out-of-range clinical values to NULL; feature imputation happens later.
+20260428T193423Z,before_cleaning,sampled_vital_sign,heartrate,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,resprate,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,o2sat,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,sbp,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_vital_sign,dbp,invalid_clinical_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,,row_count,450042.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_diagnosis,,distinct_stay_id,212262.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_diagnosis,,distinct_subject_id,126782.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_diagnosis,,duplicate_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,diagnosis_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,diagnosis_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,stay_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,stay_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,subject_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,subject_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,seq_num,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,seq_num,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,icd_code,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,icd_code,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,icd_version,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,icd_version,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,icd_title,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,icd_title,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,created_at,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,created_at,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_diagnosis,diagnosis_id,numeric_min,4.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,diagnosis_id,numeric_max,899050.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,stay_id,numeric_min,30000017.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,stay_id,numeric_max,39999965.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,subject_id,numeric_min,10000032.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,subject_id,numeric_max,19999987.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,seq_num,numeric_min,1.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,seq_num,numeric_max,9.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,icd_version,numeric_min,9.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_diagnosis,icd_version,numeric_max,10.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_pyxis,,row_count,792464.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_pyxis,,distinct_stay_id,151817.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_pyxis,,distinct_subject_id,95553.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_pyxis,,duplicate_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,pyxis_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,pyxis_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,stay_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,stay_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,subject_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,subject_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,charttime,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,charttime,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,med_rn,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,med_rn,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,name,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,name,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,gsn_rn,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,gsn_rn,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,gsn,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,gsn,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,created_at,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,created_at,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_pyxis,pyxis_id,numeric_min,3.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_pyxis,pyxis_id,numeric_max,1586053.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_pyxis,stay_id,numeric_min,30000017.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_pyxis,stay_id,numeric_max,39999964.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_pyxis,subject_id,numeric_min,10000032.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_pyxis,subject_id,numeric_max,19999987.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_med_recon,,row_count,1496207.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_med_recon,,distinct_stay_id,153653.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_med_recon,,distinct_subject_id,88796.0,,Review metric during cleaning validation.
+20260428T193423Z,before_cleaning,sampled_med_recon,,duplicate_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,med_recon_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,med_recon_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,stay_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,stay_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,subject_id,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,subject_id,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,charttime,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,charttime,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,name,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,name,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,gsn,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,gsn,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,ndc,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,ndc,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,etc_rn,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,etc_rn,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,etccode,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,etccode,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,etcdescription,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,etcdescription,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,created_at,null_count,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,created_at,null_percentage,0.0,,No cleaning action needed for this metric.
+20260428T193423Z,before_cleaning,sampled_med_recon,med_recon_id,numeric_min,15.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_med_recon,med_recon_id,numeric_max,2987330.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_med_recon,stay_id,numeric_min,30000039.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_med_recon,stay_id,numeric_max,39999964.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_med_recon,subject_id,numeric_min,10000032.0,,Use min/max to review clinical plausibility before feature engineering.
+20260428T193423Z,before_cleaning,sampled_med_recon,subject_id,numeric_max,19999828.0,,Use min/max to review clinical plausibility before feature engineering.

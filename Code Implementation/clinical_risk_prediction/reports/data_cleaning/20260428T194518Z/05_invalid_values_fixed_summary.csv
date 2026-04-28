@@ -1,0 +1,14 @@
+run_id,table_name,column_name,invalid_values_before_cleaning,invalid_values_after_cleaning,invalid_values_fixed_to_null_or_removed
+20260428T194518Z,triage,temperature,84.0,0.0,84.0
+20260428T194518Z,triage,heartrate,0.0,0.0,0.0
+20260428T194518Z,triage,resprate,0.0,0.0,0.0
+20260428T194518Z,triage,o2sat,0.0,0.0,0.0
+20260428T194518Z,triage,sbp,0.0,0.0,0.0
+20260428T194518Z,triage,dbp,0.0,0.0,0.0
+20260428T194518Z,triage,acuity,0.0,0.0,0.0
+20260428T194518Z,vital_sign,temperature,250.0,0.0,250.0
+20260428T194518Z,vital_sign,heartrate,0.0,0.0,0.0
+20260428T194518Z,vital_sign,resprate,0.0,0.0,0.0
+20260428T194518Z,vital_sign,o2sat,0.0,0.0,0.0
+20260428T194518Z,vital_sign,sbp,0.0,0.0,0.0
+20260428T194518Z,vital_sign,dbp,0.0,0.0,0.0

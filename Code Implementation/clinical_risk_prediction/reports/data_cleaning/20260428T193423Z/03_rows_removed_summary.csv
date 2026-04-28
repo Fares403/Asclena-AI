@@ -1,0 +1,7 @@
+run_id,source_table,cleaned_table,sampled_rows_before_cleaning,rows_after_cleaning,rows_removed,removed_percentage_of_sampled
+20260428T193423Z,sampled_ed_stays,cleaned_ed_stays,212807,212807,0,0.0
+20260428T193423Z,sampled_triage,cleaned_triage,212807,212807,0,0.0
+20260428T193423Z,sampled_vital_sign,cleaned_vital_sign,782552,765045,17507,2.2372
+20260428T193423Z,sampled_diagnosis,cleaned_diagnosis,450042,450042,0,0.0
+20260428T193423Z,sampled_pyxis,cleaned_pyxis,792464,792464,0,0.0
+20260428T193423Z,sampled_med_recon,cleaned_med_recon,1496207,1496206,1,0.0001

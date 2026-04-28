@@ -1,0 +1,5 @@
+host: localhost
+database: asclena_db
+user: postgres
+password: admin123
+schema: asclena

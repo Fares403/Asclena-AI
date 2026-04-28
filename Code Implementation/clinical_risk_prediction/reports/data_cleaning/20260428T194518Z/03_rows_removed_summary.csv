@@ -1,0 +1,7 @@
+run_id,source_table,cleaned_table,raw_rows_before_cleaning,rows_after_cleaning,rows_removed,removed_percentage_of_raw
+20260428T194518Z,ed_stays,cleaned_ed_stays,425087,425087,0,0.0
+20260428T194518Z,triage,cleaned_triage,425087,425087,0,0.0
+20260428T194518Z,vital_sign,cleaned_vital_sign,1564610,1529859,34751,2.2211
+20260428T194518Z,diagnosis,cleaned_diagnosis,899050,899050,0,0.0
+20260428T194518Z,pyxis,cleaned_pyxis,1586053,1586053,0,0.0
+20260428T194518Z,med_recon,cleaned_med_recon,2987342,2987340,2,0.0001

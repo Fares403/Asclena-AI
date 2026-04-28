@@ -1,0 +1,9 @@
+run_id,check_name,table_name,value
+20260428T193423Z,full_ed_stays_count,ed_stays,425087.0
+20260428T193423Z,sampled_ed_stays_count,sampled_ed_stays,212807.0
+20260428T193423Z,sampled_percentage,sampled_ed_stays,50.06
+20260428T193423Z,orphan_sampled_child_rows,sampled_triage,0.0
+20260428T193423Z,orphan_sampled_child_rows,sampled_vital_sign,0.0
+20260428T193423Z,orphan_sampled_child_rows,sampled_diagnosis,0.0
+20260428T193423Z,orphan_sampled_child_rows,sampled_pyxis,0.0
+20260428T193423Z,orphan_sampled_child_rows,sampled_med_recon,0.0

@@ -1,0 +1,8 @@
+run_id,table_name,rule_summary
+20260428T193423Z,triage,"Kept NULL numeric vitals, set invalid values to NULL, and added *_missing indicator columns."
+20260428T193423Z,triage,Set NULL or empty chiefcomplaint and pain to 'Unknown'; kept missing acuity as NULL.
+20260428T193423Z,vital_sign,Removed rows where all numeric vital measurements are NULL; no time-series imputation performed.
+20260428T193423Z,vital_sign,Kept rhythm in cleaned_vital_sign as an observed text column with NULLs preserved; never impute missing rhythm as 'Normal'.
+20260428T193423Z,diagnosis,Removed rows where both icd_code and icd_title are NULL; missing titles became 'Unknown diagnosis'.
+20260428T193423Z,pyxis,"Removed rows where name, gsn, and med_rn are all NULL; medication names received basic text cleanup only."
+20260428T193423Z,med_recon,"Removed rows where name, gsn, ndc, and etcdescription are all NULL; medication names received basic text cleanup only."

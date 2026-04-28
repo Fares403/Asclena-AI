@@ -1,0 +1,2 @@
+run_id,source_table,column_name,exclude_from_feature_engineering,exclude_from_model_training,reason,handling_policy
+20260428T194518Z,asclena.cleaned_vital_sign,rhythm,true,true,High missingness and absence of a reliable replacement; imputing Normal would create fake clinical information.,"Keep for schema consistency and auditability. Do not impute, encode, aggregate, or train on rhythm unless a later clinically validated feature policy is approved."
