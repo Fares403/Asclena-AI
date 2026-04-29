@@ -37,38 +37,47 @@ class FakeImputer:
 class ClinicalInterpretationTests(unittest.TestCase):
     def test_high_risk_respiratory_case(self) -> None:
         interpretation = build_clinical_interpretation(
-            risk_score=0.89136,
+            risk_score=1.0,
             risk_label="HIGH",
             feature_snapshot=make_snapshot(
                 {
-                    "triage_o2sat": 94,
-                    "spo2_mean": 94,
-                    "spo2_min": 93,
-                    "triage_resprate": 22,
-                    "rr_mean": 21,
-                    "triage_heartrate": 104,
-                    "hr_mean": 106,
-                    "shock_index": 0.991,
-                    "shock_index_max": 1.028,
-                    "fever_count": 1,
-                    "acuity": 3,
+                    "triage_o2sat": 90,
+                    "spo2_mean": 89,
+                    "spo2_min": 87,
+                    "triage_resprate": 24,
+                    "rr_mean": 25,
+                    "triage_heartrate": 118,
+                    "hr_mean": 121,
+                    "shock_index": 1.287,
+                    "shock_index_max": 1.389,
+                    "acuity": 2,
+                    "vital_row_count": 4,
+                    "hypoxia_count": 4,
                 }
             ),
             top_contributors=[
                 {
-                    "feature_name": "spo2_mean",
-                    "feature_value": 94,
-                    "contribution": 0.346997,
+                    "feature_name": "vital_row_count",
+                    "feature_value": 4,
+                    "contribution": 0.417219,
                     "contribution_direction": "increases_risk",
                 }
             ],
         )
         names = [item["indicator"] for item in interpretation["clinical_indicators"]]
         self.assertIn("Respiratory compromise signal", names)
+        self.assertEqual(interpretation["risk_summary"]["display_risk_score"], ">0.99")
         self.assertEqual(
             interpretation["risk_summary"]["clinical_priority"],
             "High concern - clinician review recommended",
         )
+        respiratory = next(item for item in interpretation["clinical_indicators"] if item["indicator"] == "Respiratory compromise signal")
+        self.assertTrue(any("breaths/min" in entry for entry in respiratory["evidence"]))
+        self.assertEqual(
+            interpretation["dominant_clinical_drivers"][0]["driver_type"],
+            "data_context",
+        )
+        self.assertIn("data_quality", interpretation)
 
     def test_tachycardia_case(self) -> None:
         interpretation = build_clinical_interpretation(
@@ -108,7 +117,8 @@ class ClinicalInterpretationTests(unittest.TestCase):
         )
         names = [item["indicator"] for item in interpretation["clinical_indicators"]]
         self.assertIn("Hemodynamic instability signal", names)
-        self.assertIn("Hemodynamic instability pattern", names)
+        pattern_names = [item["pattern"] for item in interpretation["clinical_patterns"]]
+        self.assertIn("Hemodynamic instability pattern", pattern_names)
 
     def test_shock_index_high_case(self) -> None:
         interpretation = build_clinical_interpretation(
@@ -141,11 +151,12 @@ class ClinicalInterpretationTests(unittest.TestCase):
                     "triage_heartrate": 112,
                     "triage_resprate": 24,
                     "shock_index_max": 0.95,
+                    "vital_row_count": 3,
                 }
             ),
             top_contributors=[],
         )
-        names = [item["indicator"] for item in interpretation["clinical_indicators"]]
+        names = [item["pattern"] for item in interpretation["clinical_patterns"]]
         self.assertIn("Sepsis-like physiology pattern", names)
 
     def test_sparse_data_case(self) -> None:
@@ -170,6 +181,7 @@ class ClinicalInterpretationTests(unittest.TestCase):
             if item["indicator"] == "Sparse data / low confidence signal"
         )
         self.assertIn(indicator["severity"], {"moderate", "high"})
+        self.assertTrue(interpretation["data_quality"]["missingness_concern"])
 
     def test_low_risk_case_with_no_strong_indicators(self) -> None:
         interpretation = build_clinical_interpretation(
@@ -210,6 +222,7 @@ class ClinicalInterpretationTests(unittest.TestCase):
         )
         self.assertIn("risk_summary", interpretation)
         self.assertIn("clinical_indicators", interpretation)
+        self.assertIn("clinical_patterns", interpretation)
 
     def test_predict_one_keeps_existing_fields_and_adds_clinical_layer(self) -> None:
         artifacts = PredictionArtifacts(
@@ -241,6 +254,50 @@ class ClinicalInterpretationTests(unittest.TestCase):
         self.assertIn("threshold_used", result)
         self.assertIn("top_contributors", result)
         self.assertIn("clinical_interpretation", result)
+        self.assertIn("data_quality", result["clinical_interpretation"])
+
+    def test_review_focus_items_are_deduplicated(self) -> None:
+        interpretation = build_clinical_interpretation(
+            risk_score=0.84,
+            risk_label="HIGH",
+            feature_snapshot=make_snapshot(
+                {
+                    "triage_o2sat": 91,
+                    "spo2_min": 89,
+                    "triage_resprate": 24,
+                    "triage_heartrate": 122,
+                    "hr_mean": 118,
+                    "sbp_min": 88,
+                    "bp_slope": -1.0,
+                    "hr_slope": 1.2,
+                    "triage_shock_index": 1.05,
+                    "vital_row_count": 4,
+                }
+            ),
+            top_contributors=[],
+        )
+        review_focus = interpretation["recommended_review_focus"]
+        self.assertEqual(len(review_focus), len(set(review_focus)))
+        self.assertLessEqual(len(review_focus), 6)
+
+    def test_indicators_and_patterns_are_separated(self) -> None:
+        interpretation = build_clinical_interpretation(
+            risk_score=0.9,
+            risk_label="HIGH",
+            feature_snapshot=make_snapshot(
+                {
+                    "triage_o2sat": 90,
+                    "spo2_min": 88,
+                    "triage_resprate": 25,
+                    "rr_mean": 24,
+                    "triage_heartrate": 120,
+                    "shock_index_max": 1.1,
+                }
+            ),
+            top_contributors=[],
+        )
+        self.assertTrue(all("indicator" in item for item in interpretation["clinical_indicators"]))
+        self.assertTrue(all("pattern" in item for item in interpretation["clinical_patterns"]))
 
 
 if __name__ == "__main__":

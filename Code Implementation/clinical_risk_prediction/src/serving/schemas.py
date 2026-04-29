@@ -57,6 +57,8 @@ class ExplanationPayload(BaseModel):
 class RiskSummary(BaseModel):
     risk_label: str
     risk_score: float
+    display_risk_score: str
+    risk_score_note: str
     clinical_priority: str
     interpretation: str
 
@@ -68,18 +70,36 @@ class ClinicalIndicator(BaseModel):
     doctor_message: str
 
 
+class ClinicalPattern(BaseModel):
+    pattern: str
+    severity: str
+    evidence: list[str]
+    doctor_message: str
+
+
 class DominantClinicalDriver(BaseModel):
     feature_name: str
     clinical_meaning: str
     feature_value: float | int | None
+    driver_type: str
     contribution_direction: str
     doctor_message: str
+
+
+class DataQualityPayload(BaseModel):
+    vital_observation_count: int | None
+    trend_interpretability: str
+    missingness_concern: bool
+    missing_features: list[str]
+    data_quality_note: str
 
 
 class ClinicalInterpretationPayload(BaseModel):
     risk_summary: RiskSummary
     clinical_indicators: list[ClinicalIndicator]
+    clinical_patterns: list[ClinicalPattern]
     dominant_clinical_drivers: list[DominantClinicalDriver]
+    data_quality: DataQualityPayload
     recommended_review_focus: list[str]
     safety_note: str
 
