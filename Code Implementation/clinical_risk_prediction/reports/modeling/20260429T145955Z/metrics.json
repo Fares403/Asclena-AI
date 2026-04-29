@@ -1,0 +1,23 @@
+{
+  "model_name": "asclena_xgboost_risk",
+  "model_version": "20260429T145955Z",
+  "feature_count": 51,
+  "train_rows": 272055,
+  "validation_rows": 68014,
+  "test_rows": 85018,
+  "positive_train_rows": 131898,
+  "negative_train_rows": 140157,
+  "scale_pos_weight": 1.0626165673474959,
+  "classification_threshold": 0.4,
+  "best_iteration": 299,
+  "roc_auc": 0.8668556128255707,
+  "pr_auc": 0.8594947026141411,
+  "accuracy": 0.7764355783481145,
+  "precision": 0.7358162051978937,
+  "recall": 0.8407287901210607,
+  "f1_score": 0.7847817471550699,
+  "confusion_matrix_tn": 31357,
+  "confusion_matrix_fp": 12442,
+  "confusion_matrix_fn": 6565,
+  "confusion_matrix_tp": 34654
+}

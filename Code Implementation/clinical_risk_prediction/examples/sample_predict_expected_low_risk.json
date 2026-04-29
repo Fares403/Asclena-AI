@@ -1,0 +1,63 @@
+{
+  "request_id": "real-example-003",
+  "subject": {
+    "patient_id": "PAT-2026-1003",
+    "encounter_id": "ENC-ED-45023",
+    "stay_id": "STAY-45023",
+    "source_system": "asclena-ai"
+  },
+  "model": {
+    "model_name": "asclena_xgboost_risk",
+    "model_version": "20260429T185149Z",
+    "feature_count": 51,
+    "classification_threshold": 0.4,
+    "risk_label_thresholds": {
+      "LOW": [0.0, 0.4],
+      "MODERATE": [0.4, 0.7],
+      "HIGH": [0.7, 1.0]
+    },
+    "calibration_method": "isotonic",
+    "contract_version": "2026-04-29"
+  },
+  "prediction": {
+    "risk_score": 0.049485,
+    "predicted_target": 0,
+    "risk_label": "LOW",
+    "threshold_used": 0.4
+  },
+  "explanation": {
+    "top_contributors": [
+      {
+        "feature_name": "acuity",
+        "feature_value": 5,
+        "contribution": -1.897291,
+        "contribution_direction": "decreases_risk"
+      },
+      {
+        "feature_name": "vital_row_count",
+        "feature_value": 2,
+        "contribution": -0.969123,
+        "contribution_direction": "decreases_risk"
+      },
+      {
+        "feature_name": "hr_slope",
+        "feature_value": 0.2,
+        "contribution": 0.377537,
+        "contribution_direction": "increases_risk"
+      },
+      {
+        "feature_name": "bp_slope",
+        "feature_value": 0.1,
+        "contribution": 0.153939,
+        "contribution_direction": "increases_risk"
+      },
+      {
+        "feature_name": "dbp_min",
+        "feature_value": 75,
+        "contribution": -0.139872,
+        "contribution_direction": "decreases_risk"
+      }
+    ]
+  },
+  "contract_version": "2026-04-29"
+}

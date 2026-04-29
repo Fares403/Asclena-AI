@@ -1,0 +1,21 @@
+{
+  "request_id": "real-example-004",
+  "subject": {
+    "patient_id": "PAT-2026-1004",
+    "encounter_id": "ENC-ED-45024",
+    "stay_id": "STAY-45024",
+    "source_system": "asclena-ai"
+  },
+  "features": {
+    "gender_male": 1,
+    "gender_female": 0,
+    "gender_unknown": 0,
+    "triage_temperature": 99.1,
+    "triage_heartrate": 118,
+    "triage_resprate": 24,
+    "triage_o2sat": 90,
+    "triage_sbp": 96,
+    "triage_dbp": 58,
+    "acuity": 2
+  }
+}

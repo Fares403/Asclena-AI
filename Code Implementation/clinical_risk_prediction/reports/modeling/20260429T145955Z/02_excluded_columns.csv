@@ -1,0 +1,17 @@
+excluded_column
+stay_id
+subject_id
+race
+arrival_transport
+disposition
+has_hadm_id
+length_of_stay_hours
+diagnosis_count
+distinct_diagnosis_count
+comorbidity_score
+pyxis_med_count
+pyxis_distinct_med_count
+med_recon_count
+med_recon_distinct_med_count
+medication_intensity_score
+risk_target

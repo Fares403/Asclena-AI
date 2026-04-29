@@ -1,0 +1,63 @@
+{
+  "request_id": "real-example-002",
+  "subject": {
+    "patient_id": "PAT-2026-1002",
+    "encounter_id": "ENC-ED-45022",
+    "stay_id": "STAY-45022",
+    "source_system": "asclena-ai"
+  },
+  "model": {
+    "model_name": "asclena_xgboost_risk",
+    "model_version": "20260429T185149Z",
+    "feature_count": 51,
+    "classification_threshold": 0.4,
+    "risk_label_thresholds": {
+      "LOW": [0.0, 0.4],
+      "MODERATE": [0.4, 0.7],
+      "HIGH": [0.7, 1.0]
+    },
+    "calibration_method": "isotonic",
+    "contract_version": "2026-04-29"
+  },
+  "prediction": {
+    "risk_score": 0.885167,
+    "predicted_target": 1,
+    "risk_label": "HIGH",
+    "threshold_used": 0.4
+  },
+  "explanation": {
+    "top_contributors": [
+      {
+        "feature_name": "spo2_mean",
+        "feature_value": 94,
+        "contribution": 0.346997,
+        "contribution_direction": "increases_risk"
+      },
+      {
+        "feature_name": "hr_min",
+        "feature_value": 102,
+        "contribution": 0.336927,
+        "contribution_direction": "increases_risk"
+      },
+      {
+        "feature_name": "spo2_min",
+        "feature_value": 93,
+        "contribution": 0.302797,
+        "contribution_direction": "increases_risk"
+      },
+      {
+        "feature_name": "triage_o2sat",
+        "feature_value": 94,
+        "contribution": 0.295671,
+        "contribution_direction": "increases_risk"
+      },
+      {
+        "feature_name": "acuity",
+        "feature_value": 3,
+        "contribution": -0.271669,
+        "contribution_direction": "decreases_risk"
+      }
+    ]
+  },
+  "contract_version": "2026-04-29"
+}

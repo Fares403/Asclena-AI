@@ -1,0 +1,93 @@
+"""Pydantic contracts for the Asclena clinical risk model API."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class SubjectContext(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    patient_id: str | None = Field(default=None, description="External patient identifier from the calling system.")
+    encounter_id: str | None = Field(default=None, description="Encounter identifier from the calling system.")
+    stay_id: str | None = Field(default=None, description="Optional ED stay identifier when available.")
+    source_system: str | None = Field(default=None, description="Originating application or EHR name.")
+
+
+class PredictionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    request_id: str | None = Field(default=None, description="Caller-generated correlation identifier.")
+    subject: SubjectContext | None = Field(
+        default=None,
+        description="Optional context identifiers passed through unchanged for integration tracing.",
+    )
+    features: dict[str, float | int | None] = Field(
+        ...,
+        description="Complete feature map for one encounter. All required feature keys must be present; values may be null.",
+    )
+
+
+class BatchPredictionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    instances: list[PredictionRequest] = Field(..., min_length=1, description="Batch of independent stateless prediction requests.")
+
+
+class LocalExplanationItem(BaseModel):
+    feature_name: str
+    feature_value: float | int | None
+    contribution: float
+    contribution_direction: str
+
+
+class FeatureSnapshotItem(BaseModel):
+    feature_name: str
+    feature_value: float | int | None
+    category: str | None = None
+
+
+class ExplanationPayload(BaseModel):
+    top_contributors: list[LocalExplanationItem]
+    feature_snapshot: list[FeatureSnapshotItem] | None = None
+
+
+class ModelMetadata(BaseModel):
+    model_name: str
+    model_version: str
+    feature_count: int
+    classification_threshold: float
+    risk_label_thresholds: dict[str, list[float]]
+    calibration_method: str
+    contract_version: str
+
+
+class PredictionResult(BaseModel):
+    risk_score: float
+    predicted_target: int
+    risk_label: str
+    threshold_used: float
+
+
+class PredictionResponse(BaseModel):
+    request_id: str | None
+    subject: SubjectContext | None
+    model: ModelMetadata
+    prediction: PredictionResult
+    explanation: ExplanationPayload
+    contract_version: str
+
+
+class BatchPredictionResponse(BaseModel):
+    model: ModelMetadata
+    predictions: list[PredictionResponse]
+    batch_size: int
+    contract_version: str
+
+
+class ErrorResponse(BaseModel):
+    error_code: str
+    message: str
+    details: dict[str, Any] | None = None
