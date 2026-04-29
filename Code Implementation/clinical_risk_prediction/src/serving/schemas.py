@@ -54,6 +54,36 @@ class ExplanationPayload(BaseModel):
     feature_snapshot: list[FeatureSnapshotItem] | None = None
 
 
+class RiskSummary(BaseModel):
+    risk_label: str
+    risk_score: float
+    clinical_priority: str
+    interpretation: str
+
+
+class ClinicalIndicator(BaseModel):
+    indicator: str
+    severity: str
+    evidence: list[str]
+    doctor_message: str
+
+
+class DominantClinicalDriver(BaseModel):
+    feature_name: str
+    clinical_meaning: str
+    feature_value: float | int | None
+    contribution_direction: str
+    doctor_message: str
+
+
+class ClinicalInterpretationPayload(BaseModel):
+    risk_summary: RiskSummary
+    clinical_indicators: list[ClinicalIndicator]
+    dominant_clinical_drivers: list[DominantClinicalDriver]
+    recommended_review_focus: list[str]
+    safety_note: str
+
+
 class ModelMetadata(BaseModel):
     model_name: str
     model_version: str
@@ -77,6 +107,7 @@ class PredictionResponse(BaseModel):
     model: ModelMetadata
     prediction: PredictionResult
     explanation: ExplanationPayload
+    clinical_interpretation: ClinicalInterpretationPayload
     contract_version: str
 
 

@@ -18,6 +18,7 @@ from .predictor import (
 from .schemas import (
     BatchPredictionRequest,
     BatchPredictionResponse,
+    ClinicalInterpretationPayload,
     ErrorResponse,
     ExplanationPayload,
     PredictionRequest,
@@ -125,6 +126,7 @@ def predict(
             top_contributors=result["top_contributors"],
             feature_snapshot=result.get("feature_snapshot"),
         ),
+        clinical_interpretation=ClinicalInterpretationPayload(**result["clinical_interpretation"]),
         contract_version=CONTRACT_VERSION,
     )
 
@@ -203,6 +205,7 @@ def batch_predict(
                     top_contributors=result["top_contributors"],
                     feature_snapshot=result.get("feature_snapshot"),
                 ),
+                clinical_interpretation=ClinicalInterpretationPayload(**result["clinical_interpretation"]),
                 contract_version=CONTRACT_VERSION,
             )
         )

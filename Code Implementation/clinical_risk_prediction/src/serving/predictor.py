@@ -10,6 +10,7 @@ import joblib
 import numpy as np
 import xgboost as xgb
 
+from .clinical_interpretation import build_clinical_interpretation
 from .feature_contract import FEATURE_GROUPS, FEATURE_SPECS
 
 
@@ -156,15 +157,23 @@ def predict_one(
     raw_matrix = _ordered_feature_values(artifacts.feature_names, features)
     transformed = artifacts.imputer.transform(raw_matrix)
     risk_score = float(artifacts.model.predict_proba(transformed)[0, 1])
+    top_contributors = _local_explanations(artifacts, transformed, features)
+    feature_snapshot = _feature_snapshot(artifacts.feature_names, features)
     response = {
         "risk_score": round(risk_score, 6),
         "predicted_target": int(risk_score >= artifacts.classification_threshold),
         "risk_label": risk_label(risk_score, artifacts.risk_label_thresholds),
         "threshold_used": artifacts.classification_threshold,
-        "top_contributors": _local_explanations(artifacts, transformed, features),
+        "top_contributors": top_contributors,
+        "clinical_interpretation": build_clinical_interpretation(
+            risk_score=risk_score,
+            risk_label=risk_label(risk_score, artifacts.risk_label_thresholds),
+            feature_snapshot=feature_snapshot,
+            top_contributors=top_contributors,
+        ),
     }
     if include_feature_snapshot:
-        response["feature_snapshot"] = _feature_snapshot(artifacts.feature_names, features)
+        response["feature_snapshot"] = feature_snapshot
     return response
 
 
