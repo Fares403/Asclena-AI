@@ -12,9 +12,18 @@
     "feature_count": 51,
     "classification_threshold": 0.4,
     "risk_label_thresholds": {
-      "LOW": [0.0, 0.4],
-      "MODERATE": [0.4, 0.7],
-      "HIGH": [0.7, 1.0]
+      "LOW": [
+        0,
+        0.4
+      ],
+      "MODERATE": [
+        0.4,
+        0.7
+      ],
+      "HIGH": [
+        0.7,
+        1
+      ]
     },
     "calibration_method": "isotonic",
     "contract_version": "2026-04-29"
@@ -58,6 +67,200 @@
         "contribution_direction": "decreases_risk"
       }
     ]
+  },
+  "clinical_interpretation": {
+    "risk_summary": {
+      "risk_label": "HIGH",
+      "risk_score": 0.885167,
+      "display_risk_score": "0.885",
+      "risk_score_note": "Calibrated probability rounded for display; this should not be interpreted as absolute certainty.",
+      "clinical_priority": "High concern - clinician review recommended",
+      "interpretation": "High predicted risk with respiratory, heart-rate, hemodynamic strain, and infection-context signals."
+    },
+    "clinical_indicators": [
+      {
+        "indicator": "Respiratory compromise signal",
+        "severity": "moderate",
+        "evidence": [
+          "Triage SpO2: 94 %",
+          "Mean SpO2: 94 %",
+          "Minimum SpO2: 93 %",
+          "Triage respiratory rate: 20 breaths/min",
+          "Mean respiratory rate: 21 breaths/min",
+          "Peak respiratory rate: 22 breaths/min"
+        ],
+        "doctor_message": "Reduced oxygen saturation with elevated respiratory rate suggests a respiratory compromise signal."
+      },
+      {
+        "indicator": "Tachycardia / physiologic stress",
+        "severity": "high",
+        "evidence": [
+          "Triage heart rate: 104 bpm",
+          "Mean heart rate: 106 bpm",
+          "Minimum heart rate: 102 bpm",
+          "Peak heart rate: 110 bpm",
+          "Tachycardia episodes: 1 episodes"
+        ],
+        "doctor_message": "Heart rate is persistently elevated, suggesting physiologic stress."
+      },
+      {
+        "indicator": "Hemodynamic instability signal",
+        "severity": "high",
+        "evidence": [
+          "Triage SBP: 108 mmHg",
+          "Mean SBP: 107 mmHg",
+          "Minimum SBP: 105 mmHg",
+          "Maximum shock index: 1.028"
+        ],
+        "doctor_message": "Hemodynamic strain markers are elevated and should be reviewed in clinical context."
+      },
+      {
+        "indicator": "Fever / infection-context signal",
+        "severity": "high",
+        "evidence": [
+          "Triage temperature: 100.2 °F",
+          "Mean temperature: 100.1 °F",
+          "Minimum temperature: 99.8 °F",
+          "Maximum temperature: 100.4 °F",
+          "Fever episodes: 1 episodes"
+        ],
+        "doctor_message": "Fever signal present; review infection source and clinical context."
+      },
+      {
+        "indicator": "Elevated shock index / hemodynamic strain",
+        "severity": "high",
+        "evidence": [
+          "Triage shock index: 0.963",
+          "Shock index: 0.991",
+          "Maximum shock index: 1.028"
+        ],
+        "doctor_message": "Shock index is near or above 1.0, which may suggest hemodynamic strain in clinical context."
+      },
+      {
+        "indicator": "Deterioration trend signal",
+        "severity": "moderate",
+        "evidence": [
+          "Vital observations: 3",
+          "Heart-rate trend value: 1.10",
+          "Blood-pressure trend value: -0.60"
+        ],
+        "doctor_message": "Repeated vital signs show a trend that should be reviewed for possible deterioration."
+      },
+      {
+        "indicator": "Triage acuity concern",
+        "severity": "moderate",
+        "evidence": [
+          "Triage acuity: 3"
+        ],
+        "doctor_message": "Triage acuity indicates moderate urgency and should be reviewed with the current physiologic findings."
+      }
+    ],
+    "clinical_patterns": [
+      {
+        "pattern": "Respiratory deterioration pattern",
+        "severity": "moderate",
+        "evidence": [
+          "Reduced oxygen saturation or hypoxia episodes detected",
+          "Respiratory rate elevation present"
+        ],
+        "doctor_message": "Respiratory compromise pattern detected. Review oxygen requirement, work of breathing, and relevant clinical context."
+      },
+      {
+        "pattern": "Hemodynamic instability pattern",
+        "severity": "high",
+        "evidence": [
+          "Low or falling systolic pressure detected",
+          "Elevated shock index or concerning combined trend is present"
+        ],
+        "doctor_message": "Hemodynamic instability pattern detected: low or falling systolic pressure, elevated shock index, or concerning combined trends. Review perfusion status and escalation need."
+      },
+      {
+        "pattern": "Cardiopulmonary stress pattern",
+        "severity": "high",
+        "evidence": [
+          "Heart-rate stress signal present",
+          "Oxygenation or respiratory-rate concern present"
+        ],
+        "doctor_message": "Cardiopulmonary stress pattern detected. Model risk appears related to heart-rate, oxygenation, and blood-pressure physiology."
+      },
+      {
+        "pattern": "Sepsis-like physiology pattern",
+        "severity": "high",
+        "evidence": [
+          "Fever signal present",
+          "Tachycardia signal present",
+          "Tachypnea signal present"
+        ],
+        "doctor_message": "Pattern suggests infection or sepsis-like physiology: fever, tachycardia, and tachypnea. Review clinical context, suspected infection source, available labs, and clinician assessment."
+      },
+      {
+        "pattern": "Fever with physiologic instability",
+        "severity": "high",
+        "evidence": [
+          "Fever episodes detected",
+          "Physiologic instability signal present"
+        ],
+        "doctor_message": "Fever is present together with physiologic instability signals. Review infection, inflammatory state, dehydration, pain, or other clinical causes."
+      }
+    ],
+    "dominant_clinical_drivers": [
+      {
+        "feature_name": "spo2_mean",
+        "clinical_meaning": "Overall oxygenation",
+        "feature_value": 94,
+        "driver_type": "model_signal",
+        "contribution_direction": "increases_risk",
+        "doctor_message": "Overall oxygenation was below ideal range and contributed to elevated respiratory risk."
+      },
+      {
+        "feature_name": "hr_min",
+        "clinical_meaning": "Lowest recorded heart rate",
+        "feature_value": 102,
+        "driver_type": "model_signal",
+        "contribution_direction": "increases_risk",
+        "doctor_message": "Lowest recorded heart rate contributed to the model estimate and should be interpreted in clinical context."
+      },
+      {
+        "feature_name": "spo2_min",
+        "clinical_meaning": "Lowest oxygen saturation episode",
+        "feature_value": 93,
+        "driver_type": "model_signal",
+        "contribution_direction": "increases_risk",
+        "doctor_message": "Lowest oxygen saturation episode was below ideal range and contributed to elevated respiratory risk."
+      },
+      {
+        "feature_name": "triage_o2sat",
+        "clinical_meaning": "Initial oxygen saturation",
+        "feature_value": 94,
+        "driver_type": "model_signal",
+        "contribution_direction": "increases_risk",
+        "doctor_message": "Initial oxygen saturation was below ideal range and contributed to elevated respiratory risk."
+      },
+      {
+        "feature_name": "acuity",
+        "clinical_meaning": "Triage severity level",
+        "feature_value": 3,
+        "driver_type": "model_signal",
+        "contribution_direction": "decreases_risk",
+        "doctor_message": "Triage severity level reduced the model-estimated risk."
+      }
+    ],
+    "data_quality": {
+      "vital_observation_count": 3,
+      "trend_interpretability": "moderate",
+      "missingness_concern": false,
+      "missing_features": [],
+      "data_quality_note": "Repeated vital-sign observations are available; trend interpretation is possible but should be reviewed in clinical context."
+    },
+    "recommended_review_focus": [
+      "Review respiratory status, oxygen requirement, and work of breathing",
+      "Review causes of tachycardia such as pain, fever, dehydration, hypoxia, or infection",
+      "Review hemodynamic stability and perfusion status",
+      "Review repeated vital-sign trends for deterioration",
+      "Review triage urgency in context of current physiology",
+      "Review sepsis context and available labs if clinically relevant"
+    ],
+    "safety_note": "This output is clinical decision support only and does not replace clinician judgment."
   },
   "contract_version": "2026-04-29"
 }

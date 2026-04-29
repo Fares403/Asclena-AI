@@ -12,9 +12,18 @@
     "feature_count": 51,
     "classification_threshold": 0.4,
     "risk_label_thresholds": {
-      "LOW": [0.0, 0.4],
-      "MODERATE": [0.4, 0.7],
-      "HIGH": [0.7, 1.0]
+      "LOW": [
+        0,
+        0.4
+      ],
+      "MODERATE": [
+        0.4,
+        0.7
+      ],
+      "HIGH": [
+        0.7,
+        1
+      ]
     },
     "calibration_method": "isotonic",
     "contract_version": "2026-04-29"
@@ -58,6 +67,90 @@
         "contribution_direction": "decreases_risk"
       }
     ]
+  },
+  "clinical_interpretation": {
+    "risk_summary": {
+      "risk_label": "LOW",
+      "risk_score": 0.049485,
+      "display_risk_score": "0.049",
+      "risk_score_note": "Calibrated probability rounded for display; this should not be interpreted as absolute certainty.",
+      "clinical_priority": "Lower concern - no strong model signal of escalation risk",
+      "interpretation": "Lower predicted risk overall, with no major abnormal vital-sign indicators detected. Trend interpretation is limited by sparse repeated measurements."
+    },
+    "clinical_indicators": [
+      {
+        "indicator": "Limited trend data context",
+        "severity": "low",
+        "evidence": [
+          "Vital observations: 2",
+          "Heart-rate trend value: 0.20",
+          "Blood-pressure trend value: 0.10"
+        ],
+        "doctor_message": "Trend interpretation is limited because only 2 vital-sign observations are available."
+      },
+      {
+        "indicator": "Triage acuity context",
+        "severity": "low",
+        "evidence": [
+          "Triage acuity: 5"
+        ],
+        "doctor_message": "Triage acuity suggests low initial urgency and reduced the model-estimated risk."
+      }
+    ],
+    "clinical_patterns": [],
+    "dominant_clinical_drivers": [
+      {
+        "feature_name": "acuity",
+        "clinical_meaning": "Triage severity level",
+        "feature_value": 5,
+        "driver_type": "model_signal",
+        "contribution_direction": "decreases_risk",
+        "doctor_message": "Triage acuity suggests low initial urgency and reduced the model-estimated risk."
+      },
+      {
+        "feature_name": "vital_row_count",
+        "clinical_meaning": "Number of vital-sign observations",
+        "feature_value": 2,
+        "driver_type": "data_context",
+        "contribution_direction": "decreases_risk",
+        "doctor_message": "Only limited repeated vital-sign data were available; trend-based interpretation should be cautious."
+      },
+      {
+        "feature_name": "hr_slope",
+        "clinical_meaning": "Heart-rate trend",
+        "feature_value": 0.2,
+        "driver_type": "model_signal",
+        "contribution_direction": "increases_risk",
+        "doctor_message": "Heart-rate trend contributed to the model estimate, but absolute heart-rate values remain within expected range."
+      },
+      {
+        "feature_name": "bp_slope",
+        "clinical_meaning": "Blood-pressure trend",
+        "feature_value": 0.1,
+        "driver_type": "model_signal",
+        "contribution_direction": "increases_risk",
+        "doctor_message": "Blood-pressure trend contributed to the model estimate, but available blood-pressure values do not meet hypotension thresholds."
+      },
+      {
+        "feature_name": "dbp_min",
+        "clinical_meaning": "Lowest diastolic blood pressure",
+        "feature_value": 75,
+        "driver_type": "model_signal",
+        "contribution_direction": "decreases_risk",
+        "doctor_message": "Lowest diastolic blood pressure remained within expected range and reduced the model-estimated risk."
+      }
+    ],
+    "data_quality": {
+      "vital_observation_count": 2,
+      "trend_interpretability": "low",
+      "missingness_concern": false,
+      "missing_features": [],
+      "data_quality_note": "Trend interpretation is limited because only a small number of repeated vital-sign observations are available."
+    },
+    "recommended_review_focus": [
+      "Review limited repeated vital-sign trend data in clinical context"
+    ],
+    "safety_note": "This output is clinical decision support only and does not replace clinician judgment."
   },
   "contract_version": "2026-04-29"
 }
