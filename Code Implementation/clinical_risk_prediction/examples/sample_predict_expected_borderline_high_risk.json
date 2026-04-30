@@ -7,9 +7,9 @@
     "source_system": "asclena-ai"
   },
   "model": {
-    "model_name": "asclena_xgboost_risk",
-    "model_version": "20260429T185149Z",
-    "feature_count": 51,
+    "model_name": "asclena_xgboost_risk_v2",
+    "model_version": "20260430T145844Z",
+    "feature_count": 67,
     "classification_threshold": 0.4,
     "risk_label_thresholds": {
       "LOW": [
@@ -29,50 +29,55 @@
     "contract_version": "2026-04-29"
   },
   "prediction": {
-    "risk_score": 0.885167,
+    "risk_score": 0.920213,
+    "display_risk_score": "0.92",
     "predicted_target": 1,
     "risk_label": "HIGH",
+    "severity_index": 1,
+    "severity_label": "ASI-1 Critical",
+    "severity_description": "Immediate clinician review recommended.",
+    "severity_scale_name": "Asclena Severity Index",
     "threshold_used": 0.4
   },
   "explanation": {
     "top_contributors": [
       {
-        "feature_name": "spo2_mean",
-        "feature_value": 94,
-        "contribution": 0.346997,
+        "feature_name": "prior_admission_count_1y",
+        "feature_value": 1,
+        "contribution": 0.377719,
         "contribution_direction": "increases_risk"
       },
       {
         "feature_name": "hr_min",
         "feature_value": 102,
-        "contribution": 0.336927,
+        "contribution": 0.340451,
         "contribution_direction": "increases_risk"
       },
       {
         "feature_name": "spo2_min",
         "feature_value": 93,
-        "contribution": 0.302797,
+        "contribution": 0.285962,
         "contribution_direction": "increases_risk"
       },
       {
-        "feature_name": "triage_o2sat",
-        "feature_value": 94,
-        "contribution": 0.295671,
-        "contribution_direction": "increases_risk"
-      },
-      {
-        "feature_name": "acuity",
+        "feature_name": "prior_ed_visit_count",
         "feature_value": 3,
-        "contribution": -0.271669,
+        "contribution": -0.273705,
         "contribution_direction": "decreases_risk"
+      },
+      {
+        "feature_name": "spo2_mean",
+        "feature_value": 94,
+        "contribution": 0.271061,
+        "contribution_direction": "increases_risk"
       }
     ]
   },
   "clinical_interpretation": {
     "risk_summary": {
       "risk_label": "HIGH",
-      "risk_score": 0.885167,
-      "display_risk_score": "0.885",
+      "risk_score": 0.920213,
+      "display_risk_score": "0.920",
       "risk_score_note": "Calibrated probability rounded for display; this should not be interpreted as absolute certainty.",
       "clinical_priority": "High concern - clinician review recommended",
       "interpretation": "High predicted risk with respiratory, heart-rate, hemodynamic strain, and infection-context signals."
@@ -205,12 +210,12 @@
     ],
     "dominant_clinical_drivers": [
       {
-        "feature_name": "spo2_mean",
-        "clinical_meaning": "Overall oxygenation",
-        "feature_value": 94,
+        "feature_name": "prior_admission_count_1y",
+        "clinical_meaning": "Prior Admission Count 1Y",
+        "feature_value": 1,
         "driver_type": "model_signal",
         "contribution_direction": "increases_risk",
-        "doctor_message": "Overall oxygenation was below ideal range and contributed to elevated respiratory risk."
+        "doctor_message": "Prior Admission Count 1Y contributed to the model estimate and should be interpreted in clinical context."
       },
       {
         "feature_name": "hr_min",
@@ -229,20 +234,20 @@
         "doctor_message": "Lowest oxygen saturation episode was below ideal range and contributed to elevated respiratory risk."
       },
       {
-        "feature_name": "triage_o2sat",
-        "clinical_meaning": "Initial oxygen saturation",
-        "feature_value": 94,
-        "driver_type": "model_signal",
-        "contribution_direction": "increases_risk",
-        "doctor_message": "Initial oxygen saturation was below ideal range and contributed to elevated respiratory risk."
-      },
-      {
-        "feature_name": "acuity",
-        "clinical_meaning": "Triage severity level",
+        "feature_name": "prior_ed_visit_count",
+        "clinical_meaning": "Prior Ed Visit Count",
         "feature_value": 3,
         "driver_type": "model_signal",
         "contribution_direction": "decreases_risk",
-        "doctor_message": "Triage severity level reduced the model-estimated risk."
+        "doctor_message": "Prior Ed Visit Count reduced the model-estimated risk."
+      },
+      {
+        "feature_name": "spo2_mean",
+        "clinical_meaning": "Overall oxygenation",
+        "feature_value": 94,
+        "driver_type": "model_signal",
+        "contribution_direction": "increases_risk",
+        "doctor_message": "Overall oxygenation was below ideal range and contributed to elevated respiratory risk."
       }
     ],
     "data_quality": {

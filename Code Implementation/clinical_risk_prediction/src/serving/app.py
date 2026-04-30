@@ -118,8 +118,13 @@ def predict(
         model=model_metadata(app.state.artifacts),
         prediction=PredictionResult(
             risk_score=result["risk_score"],
+            display_risk_score=result["display_risk_score"],
             predicted_target=result["predicted_target"],
             risk_label=result["risk_label"],
+            severity_index=result["severity_index"],
+            severity_label=result["severity_label"],
+            severity_description=result["severity_description"],
+            severity_scale_name=result["severity_scale_name"],
             threshold_used=result["threshold_used"],
         ),
         explanation=ExplanationPayload(
@@ -197,8 +202,13 @@ def batch_predict(
                 model=model_metadata(app.state.artifacts),
                 prediction=PredictionResult(
                     risk_score=result["risk_score"],
+                    display_risk_score=result["display_risk_score"],
                     predicted_target=result["predicted_target"],
                     risk_label=result["risk_label"],
+                    severity_index=result["severity_index"],
+                    severity_label=result["severity_label"],
+                    severity_description=result["severity_description"],
+                    severity_scale_name=result["severity_scale_name"],
                     threshold_used=result["threshold_used"],
                 ),
                 explanation=ExplanationPayload(

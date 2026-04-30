@@ -7,6 +7,24 @@
 
 BEGIN;
 
+CREATE TABLE IF NOT EXISTS asclena.risk_predictions (
+  risk_prediction_id BIGSERIAL PRIMARY KEY,
+  stay_id BIGINT NOT NULL,
+  subject_id BIGINT NOT NULL,
+  model_name VARCHAR(100) NOT NULL,
+  model_version VARCHAR(50) NOT NULL,
+  risk_score NUMERIC(6,5) NOT NULL,
+  predicted_target INTEGER NOT NULL,
+  risk_label VARCHAR(20) NOT NULL,
+  severity_index INTEGER,
+  severity_label VARCHAR(80),
+  severity_description TEXT,
+  severity_scale_name VARCHAR(80),
+  threshold_used NUMERIC(6,5),
+  top_features JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 DROP TABLE IF EXISTS asclena.patient_feature_store;
 
 CREATE TABLE asclena.patient_feature_store AS
@@ -186,6 +204,136 @@ med_recon_features AS (
     SUM(CASE WHEN etccode IS NULL THEN 1 ELSE 0 END) AS med_recon_missing_etccode_count
   FROM asclena.cleaned_med_recon
   GROUP BY stay_id
+),
+visit_history_features AS (
+  SELECT
+    current_ed.stay_id,
+    COUNT(previous_ed.stay_id) AS prior_ed_visit_count,
+    COUNT(previous_ed.stay_id) FILTER (
+      WHERE previous_ed.intime >= current_ed.intime - INTERVAL '30 days'
+    ) AS prior_ed_visit_count_30d,
+    COUNT(previous_ed.stay_id) FILTER (
+      WHERE previous_ed.intime >= current_ed.intime - INTERVAL '90 days'
+    ) AS prior_ed_visit_count_90d,
+    CASE
+      WHEN MAX(previous_ed.intime) IS NOT NULL
+        THEN EXTRACT(EPOCH FROM (current_ed.intime - MAX(previous_ed.intime))) / 86400.0
+      ELSE NULL
+    END AS time_since_last_ed_visit_days,
+    COUNT(previous_ed.stay_id) FILTER (
+      WHERE previous_ed.hadm_id IS NOT NULL
+         OR POSITION('ADMIT' IN UPPER(COALESCE(previous_ed.disposition, ''))) > 0
+         OR POSITION('TRANSFER' IN UPPER(COALESCE(previous_ed.disposition, ''))) > 0
+    ) AS prior_admission_count,
+    COUNT(previous_ed.stay_id) FILTER (
+      WHERE (
+        previous_ed.hadm_id IS NOT NULL
+        OR POSITION('ADMIT' IN UPPER(COALESCE(previous_ed.disposition, ''))) > 0
+        OR POSITION('TRANSFER' IN UPPER(COALESCE(previous_ed.disposition, ''))) > 0
+      )
+      AND previous_ed.intime >= current_ed.intime - INTERVAL '1 year'
+    ) AS prior_admission_count_1y,
+    COUNT(previous_ed.stay_id) FILTER (
+      WHERE POSITION('ICU' IN UPPER(COALESCE(previous_ed.disposition, ''))) > 0
+         OR POSITION('DECEASED' IN UPPER(COALESCE(previous_ed.disposition, ''))) > 0
+         OR POSITION('EXPIRED' IN UPPER(COALESCE(previous_ed.disposition, ''))) > 0
+         OR POSITION('DIED' IN UPPER(COALESCE(previous_ed.disposition, ''))) > 0
+    ) AS prior_icu_or_death_count
+  FROM ed current_ed
+  LEFT JOIN asclena.cleaned_ed_stays previous_ed
+    ON current_ed.subject_id = previous_ed.subject_id
+   AND previous_ed.intime < current_ed.intime
+  GROUP BY current_ed.stay_id, current_ed.intime
+),
+diagnosis_history_features AS (
+  SELECT
+    current_ed.stay_id,
+    COUNT(*) FILTER (
+      WHERE LEFT(previous_dx.icd_code, 1) = 'I'
+         OR previous_dx.icd_code ~ '^(39|40|41|42|43|44|45)'
+    ) AS prior_cardiovascular_dx_count,
+    COUNT(*) FILTER (
+      WHERE LEFT(previous_dx.icd_code, 1) = 'J'
+         OR previous_dx.icd_code ~ '^(46|47|48|49|50|51)'
+    ) AS prior_respiratory_dx_count,
+    COUNT(*) FILTER (
+      WHERE LEFT(previous_dx.icd_code, 1) = 'E'
+         OR previous_dx.icd_code ~ '^(24|25|26|27)'
+    ) AS prior_endocrine_dx_count,
+    COUNT(*) FILTER (
+      WHERE LEFT(previous_dx.icd_code, 1) = 'N'
+         OR previous_dx.icd_code ~ '^(58|59|60|61|62)'
+    ) AS prior_renal_dx_count,
+    COUNT(DISTINCT previous_dx.icd_code) FILTER (
+      WHERE previous_dx.icd_code IS NOT NULL
+    ) AS prior_distinct_diagnosis_count
+  FROM ed current_ed
+  LEFT JOIN asclena.cleaned_ed_stays previous_ed
+    ON current_ed.subject_id = previous_ed.subject_id
+   AND previous_ed.intime < current_ed.intime
+  LEFT JOIN asclena.cleaned_diagnosis previous_dx
+    ON previous_ed.stay_id = previous_dx.stay_id
+  GROUP BY current_ed.stay_id
+),
+latest_risk_predictions AS (
+  SELECT
+    stay_id,
+    subject_id,
+    risk_score,
+    risk_label,
+    created_at
+  FROM (
+    SELECT
+      p.*,
+      ROW_NUMBER() OVER (
+        PARTITION BY p.stay_id
+        ORDER BY p.created_at DESC, p.risk_prediction_id DESC
+      ) AS rn
+    FROM asclena.risk_predictions p
+  ) ranked_predictions
+  WHERE rn = 1
+),
+prediction_history_features AS (
+  SELECT
+    current_ed.stay_id,
+    COUNT(pred.stay_id) FILTER (
+      WHERE pred.risk_label = 'HIGH'
+    ) AS prior_high_risk_prediction_count,
+    (ARRAY_AGG(pred.risk_score ORDER BY pred.created_at DESC))[1] AS last_risk_score,
+    AVG(pred.risk_score) AS avg_prior_risk_score,
+    MAX(pred.risk_score) AS max_prior_risk_score
+  FROM ed current_ed
+  LEFT JOIN latest_risk_predictions pred
+    ON current_ed.subject_id = pred.subject_id
+   AND pred.created_at < current_ed.intime
+  GROUP BY current_ed.stay_id
+),
+patient_history_features AS (
+  SELECT
+    current_ed.stay_id,
+    COALESCE(visit.prior_ed_visit_count, 0) AS prior_ed_visit_count,
+    COALESCE(visit.prior_ed_visit_count_30d, 0) AS prior_ed_visit_count_30d,
+    COALESCE(visit.prior_ed_visit_count_90d, 0) AS prior_ed_visit_count_90d,
+    visit.time_since_last_ed_visit_days,
+    COALESCE(visit.prior_admission_count, 0) AS prior_admission_count,
+    COALESCE(visit.prior_admission_count_1y, 0) AS prior_admission_count_1y,
+    COALESCE(visit.prior_icu_or_death_count, 0) AS prior_icu_or_death_count,
+    COALESCE(dx.prior_cardiovascular_dx_count, 0) AS prior_cardiovascular_dx_count,
+    COALESCE(dx.prior_respiratory_dx_count, 0) AS prior_respiratory_dx_count,
+    COALESCE(dx.prior_endocrine_dx_count, 0) AS prior_endocrine_dx_count,
+    COALESCE(dx.prior_renal_dx_count, 0) AS prior_renal_dx_count,
+    COALESCE(dx.prior_distinct_diagnosis_count, 0) AS prior_distinct_diagnosis_count,
+    COALESCE(pred.prior_high_risk_prediction_count, 0) AS prior_high_risk_prediction_count,
+    pred.last_risk_score,
+    pred.avg_prior_risk_score,
+    pred.max_prior_risk_score
+  FROM ed current_ed
+  LEFT JOIN visit_history_features visit
+    ON current_ed.stay_id = visit.stay_id
+  LEFT JOIN diagnosis_history_features dx
+    ON current_ed.stay_id = dx.stay_id
+  LEFT JOIN prediction_history_features pred
+    ON current_ed.stay_id = pred.stay_id
 )
 SELECT
   ed.stay_id,
@@ -277,6 +425,22 @@ SELECT
   COALESCE(recon.med_recon_distinct_med_count, 0) AS med_recon_distinct_med_count,
   COALESCE(recon.med_recon_distinct_ndc_count, 0) AS med_recon_distinct_ndc_count,
   COALESCE(recon.med_recon_missing_etccode_count, 0) AS med_recon_missing_etccode_count,
+  history.prior_ed_visit_count,
+  history.prior_ed_visit_count_30d,
+  history.prior_ed_visit_count_90d,
+  history.time_since_last_ed_visit_days::numeric(10,4) AS time_since_last_ed_visit_days,
+  history.prior_admission_count,
+  history.prior_admission_count_1y,
+  history.prior_icu_or_death_count,
+  history.prior_cardiovascular_dx_count,
+  history.prior_respiratory_dx_count,
+  history.prior_endocrine_dx_count,
+  history.prior_renal_dx_count,
+  history.prior_distinct_diagnosis_count,
+  history.prior_high_risk_prediction_count,
+  history.last_risk_score::numeric(8,5) AS last_risk_score,
+  history.avg_prior_risk_score::numeric(8,5) AS avg_prior_risk_score,
+  history.max_prior_risk_score::numeric(8,5) AS max_prior_risk_score,
   (
     COALESCE(pyxis.pyxis_med_count, 0)
     + COALESCE(recon.med_recon_count, 0)
@@ -302,7 +466,9 @@ LEFT JOIN diagnosis_features dx
 LEFT JOIN pyxis_features pyxis
   ON ed.stay_id = pyxis.stay_id
 LEFT JOIN med_recon_features recon
-  ON ed.stay_id = recon.stay_id;
+  ON ed.stay_id = recon.stay_id
+LEFT JOIN patient_history_features history
+  ON ed.stay_id = history.stay_id;
 
 ALTER TABLE asclena.patient_feature_store
 ADD PRIMARY KEY (stay_id);
@@ -346,6 +512,22 @@ VALUES
   ('med_recon_count', FALSE, 'future_feature', 'Medication reconciliation availability may vary by workflow.'),
   ('med_recon_distinct_med_count', FALSE, 'future_feature', 'Medication reconciliation availability may vary by workflow.'),
   ('medication_intensity_score', FALSE, 'future_feature', 'Medication intensity can leak downstream care decisions.'),
+  ('prior_ed_visit_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_ed_visit_count_30d', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_ed_visit_count_90d', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('time_since_last_ed_visit_days', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_admission_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_admission_count_1y', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_icu_or_death_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_cardiovascular_dx_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_respiratory_dx_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_endocrine_dx_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_renal_dx_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_distinct_diagnosis_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('prior_high_risk_prediction_count', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('last_risk_score', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('avg_prior_risk_score', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
+  ('max_prior_risk_score', TRUE, 'history_feature', 'Uses only prior patient history before current ED stay; adds patient-aware context without future leakage.'),
   ('risk_target', FALSE, 'target', 'Binary training label, never a predictor.');
 
 ANALYZE asclena.patient_feature_store;

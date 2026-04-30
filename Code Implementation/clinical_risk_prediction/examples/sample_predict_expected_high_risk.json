@@ -7,9 +7,9 @@
     "source_system": "asclena-ai"
   },
   "model": {
-    "model_name": "asclena_xgboost_risk",
-    "model_version": "20260429T185149Z",
-    "feature_count": 51,
+    "model_name": "asclena_xgboost_risk_v2",
+    "model_version": "patient_aware_v2_20260430T145844Z",
+    "feature_count": 67,
     "classification_threshold": 0.4,
     "risk_label_thresholds": {
       "LOW": [
@@ -32,6 +32,10 @@
     "risk_score": 1,
     "predicted_target": 1,
     "risk_label": "HIGH",
+    "severity_index": 1,
+    "severity_label": "ASI-1 Critical",
+    "severity_description": "Immediate clinician review recommended.",
+    "severity_scale_name": "Asclena Severity Index",
     "threshold_used": 0.4
   },
   "explanation": {

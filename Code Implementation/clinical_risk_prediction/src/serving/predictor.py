@@ -15,6 +15,7 @@ from .feature_contract import FEATURE_GROUPS, FEATURE_SPECS
 
 
 CONTRACT_VERSION = "2026-04-29"
+EXPECTED_V2_FEATURE_COUNT = 67
 DEFAULT_RISK_LABEL_THRESHOLDS = {
     "LOW": [0.0, 0.4],
     "MODERATE": [0.4, 0.7],
@@ -28,6 +29,7 @@ class PredictionArtifacts:
     explanation_model: Any
     imputer: Any
     feature_names: list[str]
+    transformed_feature_names: list[str]
     leakage_or_excluded_columns: list[str]
     model_name: str
     model_version: str
@@ -56,19 +58,41 @@ def load_prediction_artifacts(model_path: Path) -> PredictionArtifacts:
     artifact = joblib.load(model_path)
     explanation_model = artifact.get("explanation_model", artifact["model"])
     feature_names = list(artifact["feature_names"])
+    if not {"model", "imputer", "feature_names", "classification_threshold", "model_name", "model_version"} <= set(artifact):
+        missing_keys = sorted(
+            {"model", "imputer", "feature_names", "classification_threshold", "model_name", "model_version"} - set(artifact)
+        )
+        raise ValueError(f"Loaded model artifact is missing required serving fields: {missing_keys}")
     unknown_features = [feature_name for feature_name in feature_names if feature_name not in FEATURE_SPECS]
     if unknown_features:
         raise ValueError(
             "Loaded model artifact contains feature names that are missing from the serving contract: "
             f"{unknown_features}"
         )
+    model_name = str(artifact["model_name"])
+    transformed_feature_names = list(artifact.get("transformed_feature_names", []))
+    if not transformed_feature_names:
+        statistics = getattr(artifact["imputer"], "statistics_", None)
+        if statistics is not None and len(statistics) == len(feature_names):
+            transformed_feature_names = [
+                feature_name
+                for feature_name, statistic in zip(feature_names, statistics, strict=True)
+                if not (isinstance(statistic, float) and np.isnan(statistic))
+            ]
+        else:
+            transformed_feature_names = list(feature_names)
+    if model_name.endswith("_v2") and len(feature_names) != EXPECTED_V2_FEATURE_COUNT:
+        raise ValueError(
+            f"Loaded V2 model artifact must expose {EXPECTED_V2_FEATURE_COUNT} features, got {len(feature_names)}."
+        )
     return PredictionArtifacts(
         model=artifact["model"],
         explanation_model=explanation_model,
         imputer=artifact["imputer"],
         feature_names=feature_names,
+        transformed_feature_names=transformed_feature_names,
         leakage_or_excluded_columns=list(artifact.get("leakage_or_excluded_columns", [])),
-        model_name=str(artifact["model_name"]),
+        model_name=model_name,
         model_version=str(artifact["model_version"]),
         classification_threshold=float(artifact["classification_threshold"]),
         risk_label_thresholds=dict(artifact.get("risk_label_thresholds", DEFAULT_RISK_LABEL_THRESHOLDS)),
@@ -85,6 +109,56 @@ def risk_label(score: float, thresholds: dict[str, list[float]]) -> str:
     if score >= moderate_floor:
         return "MODERATE"
     return "LOW"
+
+
+def display_risk_score(score: float) -> str:
+    if score >= 0.99:
+        return ">0.99"
+    return f"{score:.2f}"
+
+
+def asclena_severity(score: float) -> dict[str, Any]:
+    if score >= 0.85:
+        return {
+            "severity_index": 1,
+            "severity_label": "ASI-1 Critical",
+            "severity_description": "Immediate clinician review recommended.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    if score >= 0.70:
+        return {
+            "severity_index": 2,
+            "severity_label": "ASI-2 Very High Risk",
+            "severity_description": "Very high risk; urgent clinician review recommended.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    if score >= 0.55:
+        return {
+            "severity_index": 3,
+            "severity_label": "ASI-3 High Risk",
+            "severity_description": "High risk; close monitoring recommended.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    if score >= 0.40:
+        return {
+            "severity_index": 4,
+            "severity_label": "ASI-4 Moderate Risk",
+            "severity_description": "Moderate risk; reassessment may be appropriate.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    if score >= 0.20:
+        return {
+            "severity_index": 5,
+            "severity_label": "ASI-5 Low Risk",
+            "severity_description": "Low predicted risk based on available data.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    return {
+        "severity_index": 6,
+        "severity_label": "ASI-6 Minimal Risk",
+        "severity_description": "Minimal predicted risk based on available data.",
+        "severity_scale_name": "Asclena Severity Index",
+    }
 
 
 def validate_feature_payload(feature_names: list[str], features: dict[str, float | int | None]) -> None:
@@ -116,11 +190,14 @@ def _local_explanations(
 ) -> list[dict[str, Any]]:
     if not hasattr(artifacts.explanation_model, "get_booster"):
         return []
+    effective_feature_names = list(artifacts.transformed_feature_names)
+    if transformed_matrix.shape[1] != len(effective_feature_names):
+        return []
     booster = artifacts.explanation_model.get_booster()
-    dmatrix = xgb.DMatrix(transformed_matrix, feature_names=artifacts.feature_names)
+    dmatrix = xgb.DMatrix(transformed_matrix, feature_names=effective_feature_names)
     contribs = booster.predict(dmatrix, pred_contribs=True)[0]
     ranked = []
-    for feature_name, contribution in zip(artifacts.feature_names, contribs[:-1], strict=True):
+    for feature_name, contribution in zip(effective_feature_names, contribs[:-1], strict=True):
         ranked.append(
             {
                 "feature_name": feature_name,
@@ -156,13 +233,20 @@ def predict_one(
     validate_feature_payload(artifacts.feature_names, features)
     raw_matrix = _ordered_feature_values(artifacts.feature_names, features)
     transformed = artifacts.imputer.transform(raw_matrix)
-    risk_score = float(artifacts.model.predict_proba(transformed)[0, 1])
+    raw_risk_score = float(artifacts.model.predict_proba(transformed)[0, 1])
+    risk_score = min(raw_risk_score, 0.999)
+    severity = asclena_severity(risk_score)
     top_contributors = _local_explanations(artifacts, transformed, features)
     feature_snapshot = _feature_snapshot(artifacts.feature_names, features)
     response = {
         "risk_score": round(risk_score, 6),
+        "display_risk_score": display_risk_score(risk_score),
         "predicted_target": int(risk_score >= artifacts.classification_threshold),
         "risk_label": risk_label(risk_score, artifacts.risk_label_thresholds),
+        "severity_index": severity["severity_index"],
+        "severity_label": severity["severity_label"],
+        "severity_description": severity["severity_description"],
+        "severity_scale_name": severity["severity_scale_name"],
         "threshold_used": artifacts.classification_threshold,
         "top_contributors": top_contributors,
         "clinical_interpretation": build_clinical_interpretation(

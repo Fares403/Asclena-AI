@@ -91,6 +91,7 @@ Purpose:
 - aggregate encounter features
 - derive missingness indicators
 - derive temporal and clinical summary features
+- derive prior-patient history features using only visits before the current stay
 - construct one row per ED stay
 
 Inputs:
@@ -102,6 +103,12 @@ Outputs:
 
 - `asclena.patient_feature_store`
 - reports in `reports/feature_engineering/<run_id>/`
+
+V2 note:
+
+- `patient_feature_store` remains one row per `stay_id`
+- V2 adds patient-aware history features from prior visits, prior diagnoses, prior admission signals, and prior model predictions
+- all history logic is leakage-safe and must satisfy `previous.intime < current.intime`
 
 ### Stage 3: Model Training
 
@@ -117,6 +124,12 @@ Purpose:
 - evaluate model quality
 - save artifact and prediction outputs
 
+V2 note:
+
+- the training target remains binary `risk_target`
+- the model stays XGBoost
+- V2 artifacts are patient-aware because the feature matrix now includes prior-history features
+
 Inputs:
 
 - `asclena.patient_feature_store`
@@ -127,6 +140,13 @@ Outputs:
 - `.joblib` model artifact in `models/`
 - reports in `reports/modeling/<model_version>/`
 - optional predictions in `asclena.risk_predictions`
+
+Prediction outputs now also include an internal additive severity layer:
+
+- `severity_index`
+- `severity_label`
+- `severity_description`
+- `severity_scale_name = "Asclena Severity Index"`
 
 ### Stage 4: Stateless Inference Serving
 
@@ -167,7 +187,7 @@ Handled at serving and integration time:
 - receive already normalized feature payload
 - validate feature contract
 - run inference
-- return risk score, label, and top contributors
+- return risk score, binary label, ASI severity output, and top contributors
 
 ### Upstream Asclena AI responsibility
 

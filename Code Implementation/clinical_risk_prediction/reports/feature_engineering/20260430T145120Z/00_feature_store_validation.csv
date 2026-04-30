@@ -1,0 +1,9 @@
+run_id,check_name,value,expected_value,passes
+20260430T145120Z,matches_cleaned_ed_stays_count,425087,425087,true
+20260430T145120Z,one_row_per_stay_id,425087,425087,true
+20260430T145120Z,no_null_identifiers,0,0,true
+20260430T145120Z,no_orphan_feature_rows,0,0,true
+20260430T145120Z,no_duplicate_stay_id_groups,0,0,true
+20260430T145120Z,risk_target_has_no_nulls,0,0,true
+20260430T145120Z,risk_target_has_positive_class,206092,1,true
+20260430T145120Z,risk_target_has_negative_class,218995,1,true

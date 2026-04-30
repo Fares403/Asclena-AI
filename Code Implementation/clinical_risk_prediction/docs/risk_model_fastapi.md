@@ -17,12 +17,18 @@ The service is designed for:
 The service does **not** read PostgreSQL during inference.
 All required model features must be sent in the request payload.
 
+V2 note:
+
+- the model remains visit-based at inference time
+- the payload now includes additive patient-history features engineered offline before the current ED stay
+- the response also includes the internal `Asclena Severity Index (ASI)` derived from `risk_score`
+
 ## Deployment Structure
 
 ```text
 clinical_risk_prediction/
   models/
-    asclena_xgboost_risk_<model_version>.joblib
+    asclena_xgboost_risk_v2_<model_version>.joblib
   src/
     serving/
       __init__.py
@@ -195,7 +201,23 @@ Request:
     "resprate_missing_rate": 0.0,
     "o2sat_missing_rate": 0.0,
     "sbp_missing_rate": 0.0,
-    "dbp_missing_rate": 0.0
+    "dbp_missing_rate": 0.0,
+    "prior_ed_visit_count": 3,
+    "prior_ed_visit_count_30d": 1,
+    "prior_ed_visit_count_90d": 2,
+    "time_since_last_ed_visit_days": 19.0,
+    "prior_admission_count": 1,
+    "prior_admission_count_1y": 1,
+    "prior_icu_or_death_count": 0,
+    "prior_cardiovascular_dx_count": 1,
+    "prior_respiratory_dx_count": 2,
+    "prior_endocrine_dx_count": 1,
+    "prior_renal_dx_count": 0,
+    "prior_distinct_diagnosis_count": 5,
+    "prior_high_risk_prediction_count": 1,
+    "last_risk_score": 0.73125,
+    "avg_prior_risk_score": 0.58422,
+    "max_prior_risk_score": 0.73125
   }
 }
 ```
@@ -206,6 +228,7 @@ Rules:
 - values may be `null`
 - unknown feature names are rejected
 - excluded or leakage columns are not allowed in the feature contract
+- V2 payloads include both current-visit features and additive history features for prior utilization, prior diagnoses, prior admissions, and prior model scores
 
 Success response:
 
@@ -219,9 +242,9 @@ Success response:
     "source_system": "asclena-ai"
   },
   "model": {
-    "model_name": "asclena_xgboost_risk",
-    "model_version": "20260429T184534Z",
-    "feature_count": 51,
+    "model_name": "asclena_xgboost_risk_v2",
+    "model_version": "patient_aware_v2_20260430T145844Z",
+    "feature_count": 67,
     "classification_threshold": 0.4,
     "risk_label_thresholds": {
       "LOW": [0.0, 0.4],
@@ -235,6 +258,10 @@ Success response:
     "risk_score": 1.0,
     "predicted_target": 1,
     "risk_label": "HIGH",
+    "severity_index": 1,
+    "severity_label": "ASI-1 Critical",
+    "severity_description": "Immediate clinician review recommended.",
+    "severity_scale_name": "Asclena Severity Index",
     "threshold_used": 0.4
   },
   "explanation": {
@@ -288,6 +315,21 @@ Response:
 - `predictions`
 - `batch_size`
 - `contract_version`
+
+## ASI Severity Output
+
+Every successful prediction now includes:
+
+- `severity_index`
+- `severity_label`
+- `severity_description`
+- `severity_scale_name`
+
+Important:
+
+- `severity_scale_name` is always `Asclena Severity Index`
+- ASI is an internal Asclena severity scale derived from model probability
+- ASI is not an official ESI score and does not replace clinician triage judgment
 
 ## Error Cases
 

@@ -16,12 +16,12 @@ class ServiceSettings:
 
 
 def _latest_model_path(models_dir: Path) -> Path:
-    artifacts = sorted(models_dir.glob("*.joblib"))
+    artifacts = list(models_dir.glob("*.joblib"))
     if not artifacts:
         raise FileNotFoundError(
             f"No model artifacts found in {models_dir}. Train the model or set ASCLENA_RISK_MODEL_PATH."
         )
-    return artifacts[-1]
+    return max(artifacts, key=lambda artifact: artifact.stat().st_mtime)
 
 
 def get_settings() -> ServiceSettings:

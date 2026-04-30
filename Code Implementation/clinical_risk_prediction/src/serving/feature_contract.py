@@ -310,6 +310,102 @@ FEATURE_SPECS = {
         "description": "Fraction of vital rows missing diastolic blood pressure.",
         "future_fhir_source": "Derived from Observation completeness",
     },
+    "prior_ed_visit_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior ED visits for the same patient before the current stay.",
+        "future_fhir_source": "Derived from prior Encounter history before current Encounter.start",
+    },
+    "prior_ed_visit_count_30d": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior ED visits for the same patient within 30 days before the current stay.",
+        "future_fhir_source": "Derived from prior Encounter history before current Encounter.start",
+    },
+    "prior_ed_visit_count_90d": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior ED visits for the same patient within 90 days before the current stay.",
+        "future_fhir_source": "Derived from prior Encounter history before current Encounter.start",
+    },
+    "time_since_last_ed_visit_days": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Days since the patient's last ED visit before the current stay.",
+        "future_fhir_source": "Derived from prior Encounter timing before current Encounter.start",
+    },
+    "prior_admission_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior admissions or transfer-to-admit signals before the current ED stay.",
+        "future_fhir_source": "Derived from prior Encounter disposition or linked Admission history before current Encounter.start",
+    },
+    "prior_admission_count_1y": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior admissions or transfer-to-admit signals within one year before the current ED stay.",
+        "future_fhir_source": "Derived from prior Encounter disposition or linked Admission history before current Encounter.start",
+    },
+    "prior_icu_or_death_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior ICU or death-related disposition signals before the current ED stay.",
+        "future_fhir_source": "Derived from prior Encounter disposition history before current Encounter.start",
+    },
+    "prior_cardiovascular_dx_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior cardiovascular diagnosis rows from visits before the current ED stay.",
+        "future_fhir_source": "Derived from prior Condition or diagnosis history before current Encounter.start",
+    },
+    "prior_respiratory_dx_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior respiratory diagnosis rows from visits before the current ED stay.",
+        "future_fhir_source": "Derived from prior Condition or diagnosis history before current Encounter.start",
+    },
+    "prior_endocrine_dx_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior endocrine diagnosis rows from visits before the current ED stay.",
+        "future_fhir_source": "Derived from prior Condition or diagnosis history before current Encounter.start",
+    },
+    "prior_renal_dx_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior renal diagnosis rows from visits before the current ED stay.",
+        "future_fhir_source": "Derived from prior Condition or diagnosis history before current Encounter.start",
+    },
+    "prior_distinct_diagnosis_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of distinct prior diagnosis codes recorded before the current ED stay.",
+        "future_fhir_source": "Derived from prior Condition or diagnosis history before current Encounter.start",
+    },
+    "prior_high_risk_prediction_count": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Count of prior model predictions labeled HIGH and created before the current ED stay.",
+        "future_fhir_source": "Derived from prior internal model outputs before current Encounter.start",
+    },
+    "last_risk_score": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Most recent prior model risk score created before the current ED stay.",
+        "future_fhir_source": "Derived from prior internal model outputs before current Encounter.start",
+    },
+    "avg_prior_risk_score": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Average of prior model risk scores created before the current ED stay.",
+        "future_fhir_source": "Derived from prior internal model outputs before current Encounter.start",
+    },
+    "max_prior_risk_score": {
+        "category": "history",
+        "type": "numeric",
+        "description": "Maximum prior model risk score created before the current ED stay.",
+        "future_fhir_source": "Derived from prior internal model outputs before current Encounter.start",
+    },
 }
 
 
@@ -321,4 +417,5 @@ FEATURE_GROUPS = {
     "trend": "Time-aware deterioration or recovery features.",
     "event_count": "Counts of threshold-based instability events across vital rows.",
     "missingness": "Signals describing unavailable data, preserving EHR completeness patterns.",
+    "history": "Patient-aware features derived only from prior visits, diagnoses, admissions, and prior model outputs before the current stay.",
 }

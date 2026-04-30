@@ -4,6 +4,11 @@
 
 These example files give a stable request and an expected response shape for quick manual verification of the deployed API.
 
+V2 note:
+
+- request payloads now include additive patient-history features
+- responses include additive `Asclena Severity Index` fields derived from `risk_score`
+
 Files:
 
 - `sample_predict_request_high_risk.json`
@@ -27,11 +32,13 @@ curl -X POST "http://127.0.0.1:8002/v1/predict" \
 
 ## Expected key result
 
-For the current trained artifact `asclena_xgboost_risk_20260429T184534Z.joblib`, the important expected values are:
+For a current V2 artifact such as `asclena_xgboost_risk_v2_<model_version>.joblib`, the important expected values are:
 
 - `risk_score = 1.0`
 - `predicted_target = 1`
 - `risk_label = HIGH`
+- `severity_index = 1`
+- `severity_label = ASI-1 Critical`
 - `calibration_method = isotonic`
 
 Expected leading contributors:
@@ -61,6 +68,7 @@ Expected:
 - `risk_score = 0.049485`
 - `predicted_target = 0`
 - `risk_label = LOW`
+- `severity_index = 6`
 
 ### Invalid contract case
 
@@ -81,7 +89,9 @@ When verifying manually, focus on:
 - `prediction.risk_score`
 - `prediction.predicted_target`
 - `prediction.risk_label`
+- `prediction.severity_index`
+- `prediction.severity_label`
 - top contributor ordering
 
 If the model artifact version changes, this expected output should be regenerated.
-The calibrated model keeps the same request and response schema, but probability values can shift because `risk_score` is now calibrated on the validation set.
+The V2 model keeps the same endpoint and request/response envelope shape, but probability and severity values can shift because `risk_score` is calibrated on the validation set and the feature set now includes prior patient history.

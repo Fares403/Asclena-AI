@@ -93,6 +93,22 @@ MODEL_FEATURES = [
     "o2sat_missing_rate",
     "sbp_missing_rate",
     "dbp_missing_rate",
+    "prior_ed_visit_count",
+    "prior_ed_visit_count_30d",
+    "prior_ed_visit_count_90d",
+    "time_since_last_ed_visit_days",
+    "prior_admission_count",
+    "prior_admission_count_1y",
+    "prior_icu_or_death_count",
+    "prior_cardiovascular_dx_count",
+    "prior_respiratory_dx_count",
+    "prior_endocrine_dx_count",
+    "prior_renal_dx_count",
+    "prior_distinct_diagnosis_count",
+    "prior_high_risk_prediction_count",
+    "last_risk_score",
+    "avg_prior_risk_score",
+    "max_prior_risk_score",
 ]
 
 LEAKAGE_OR_EXCLUDED_COLUMNS = [
@@ -236,6 +252,50 @@ def risk_label(score: float) -> str:
     return "LOW"
 
 
+def asclena_severity(score: float) -> dict[str, Any]:
+    if score >= 0.85:
+        return {
+            "severity_index": 1,
+            "severity_label": "ASI-1 Critical",
+            "severity_description": "Immediate clinician review recommended.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    if score >= 0.70:
+        return {
+            "severity_index": 2,
+            "severity_label": "ASI-2 Very High Risk",
+            "severity_description": "Very high risk; urgent clinician review recommended.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    if score >= 0.55:
+        return {
+            "severity_index": 3,
+            "severity_label": "ASI-3 High Risk",
+            "severity_description": "High risk; close monitoring recommended.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    if score >= 0.40:
+        return {
+            "severity_index": 4,
+            "severity_label": "ASI-4 Moderate Risk",
+            "severity_description": "Moderate risk; reassessment may be appropriate.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    if score >= 0.20:
+        return {
+            "severity_index": 5,
+            "severity_label": "ASI-5 Low Risk",
+            "severity_description": "Low predicted risk based on available data.",
+            "severity_scale_name": "Asclena Severity Index",
+        }
+    return {
+        "severity_index": 6,
+        "severity_label": "ASI-6 Minimal Risk",
+        "severity_description": "Minimal predicted risk based on available data.",
+        "severity_scale_name": "Asclena Severity Index",
+    }
+
+
 def load_feature_store(conn: "Connection", schema: str) -> "pl.DataFrame":
     selected_columns = ["stay_id", "subject_id", *MODEL_FEATURES, "risk_target"]
     select_sql = ",\n  ".join(
@@ -258,9 +318,14 @@ def validate_feature_columns(df: "pl.DataFrame") -> None:
 
 
 def feature_importance_json(model: Any, limit: int = 20) -> tuple[str, list[dict[str, Any]]]:
-    importances = model.feature_importances_
+    raw_importances = list(model.feature_importances_)
+    if len(raw_importances) < len(MODEL_FEATURES):
+        raw_importances.extend([0.0] * (len(MODEL_FEATURES) - len(raw_importances)))
+    elif len(raw_importances) > len(MODEL_FEATURES):
+        raw_importances = raw_importances[: len(MODEL_FEATURES)]
+
     ranked = sorted(
-        zip(MODEL_FEATURES, importances, strict=True),
+        zip(MODEL_FEATURES, raw_importances, strict=True),
         key=lambda item: float(item[1]),
         reverse=True,
     )[:limit]
@@ -330,6 +395,10 @@ def save_predictions(
             float(row["risk_score"]),
             int(row["predicted_target"]),
             row["risk_label"],
+            int(row["severity_index"]),
+            row["severity_label"],
+            row["severity_description"],
+            row["severity_scale_name"],
             float(row["threshold_used"]),
             row["top_features"],
         )
@@ -358,13 +427,17 @@ def save_predictions(
               risk_score,
               predicted_target,
               risk_label,
+              severity_index,
+              severity_label,
+              severity_description,
+              severity_scale_name,
               threshold_used,
               top_features
             )
             VALUES %s
             """,
             rows,
-            template="(%s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb)",
+            template="(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb)",
             page_size=5000,
         )
     raw_conn.commit()
@@ -420,7 +493,7 @@ def train_and_evaluate(args: argparse.Namespace) -> None:
     y_test = target[test_idx]
     y_val = target[val_idx]
 
-    imputer = SimpleImputer(strategy="median")
+    imputer = SimpleImputer(strategy="median", keep_empty_features=True)
     X_train_imputed = imputer.fit_transform(X_train)
     X_val = X[val_idx]
     X_test_imputed = imputer.transform(X_test)
@@ -513,11 +586,16 @@ def train_and_evaluate(args: argparse.Namespace) -> None:
 
     all_risk_scores = calibrated_model.predict_proba(X_all_imputed)[:, 1]
     all_predictions = (all_risk_scores >= args.classification_threshold).astype(int)
+    severity_payloads = [asclena_severity(float(score)) for score in all_risk_scores]
     prediction_df = stay_subject.with_columns(
         [
             pl.Series("risk_score", all_risk_scores).round(5),
             pl.Series("predicted_target", all_predictions),
             pl.Series("risk_label", [risk_label(float(score)) for score in all_risk_scores]),
+            pl.Series("severity_index", [item["severity_index"] for item in severity_payloads]),
+            pl.Series("severity_label", [item["severity_label"] for item in severity_payloads]),
+            pl.Series("severity_description", [item["severity_description"] for item in severity_payloads]),
+            pl.Series("severity_scale_name", [item["severity_scale_name"] for item in severity_payloads]),
             pl.lit(float(args.classification_threshold)).alias("threshold_used"),
             pl.lit(top_features_json).alias("top_features"),
         ]
@@ -528,6 +606,7 @@ def train_and_evaluate(args: argparse.Namespace) -> None:
         "explanation_model": model,
         "imputer": imputer,
         "feature_names": MODEL_FEATURES,
+        "transformed_feature_names": MODEL_FEATURES,
         "leakage_or_excluded_columns": LEAKAGE_OR_EXCLUDED_COLUMNS,
         "model_name": args.model_name,
         "model_version": model_version,
@@ -584,7 +663,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=default_output)
     parser.add_argument("--model-dir", type=Path, default=default_model_dir)
     parser.add_argument("--sql-dir", type=Path, default=default_sql_dir)
-    parser.add_argument("--model-name", default="asclena_xgboost_risk")
+    parser.add_argument("--model-name", default="asclena_xgboost_risk_v2")
     parser.add_argument("--model-version", default=None)
     parser.add_argument("--test-size", type=float, default=0.20)
     parser.add_argument("--random-state", type=int, default=42)

@@ -57,6 +57,22 @@
     "resprate_missing_rate": 0.0,
     "o2sat_missing_rate": 0.0,
     "sbp_missing_rate": 0.0,
-    "dbp_missing_rate": 0.0
+    "dbp_missing_rate": 0.0,
+    "prior_ed_visit_count": 0,
+    "prior_ed_visit_count_30d": 0,
+    "prior_ed_visit_count_90d": 0,
+    "time_since_last_ed_visit_days": null,
+    "prior_admission_count": 0,
+    "prior_admission_count_1y": 0,
+    "prior_icu_or_death_count": 0,
+    "prior_cardiovascular_dx_count": 0,
+    "prior_respiratory_dx_count": 0,
+    "prior_endocrine_dx_count": 0,
+    "prior_renal_dx_count": 0,
+    "prior_distinct_diagnosis_count": 0,
+    "prior_high_risk_prediction_count": 0,
+    "last_risk_score": null,
+    "avg_prior_risk_score": null,
+    "max_prior_risk_score": null
   }
 }

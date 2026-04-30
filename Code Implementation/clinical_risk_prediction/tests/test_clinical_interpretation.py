@@ -10,7 +10,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.serving.clinical_interpretation import build_clinical_interpretation
-from src.serving.predictor import PredictionArtifacts, predict_one
+from src.serving.predictor import PredictionArtifacts, asclena_severity, predict_one
 
 
 def make_snapshot(values: dict[str, float | int | None]) -> list[dict[str, float | int | None]]:
@@ -231,6 +231,7 @@ class ClinicalInterpretationTests(unittest.TestCase):
             explanation_model=SimpleNamespace(),
             imputer=FakeImputer(),
             feature_names=["triage_o2sat", "triage_heartrate", "triage_resprate", "sbp_min", "shock_index"],
+            transformed_feature_names=["triage_o2sat", "triage_heartrate", "triage_resprate", "sbp_min", "shock_index"],
             leakage_or_excluded_columns=[],
             model_name="asclena_xgboost_risk",
             model_version="test",
@@ -252,11 +253,17 @@ class ClinicalInterpretationTests(unittest.TestCase):
         self.assertIn("risk_score", result)
         self.assertIn("predicted_target", result)
         self.assertIn("risk_label", result)
+        self.assertIn("severity_index", result)
+        self.assertIn("severity_label", result)
+        self.assertIn("severity_description", result)
+        self.assertIn("severity_scale_name", result)
         self.assertIn("threshold_used", result)
         self.assertIn("top_contributors", result)
         self.assertIn("clinical_interpretation", result)
         self.assertIn("data_quality", result["clinical_interpretation"])
         self.assertIn("clinical_patterns", result["clinical_interpretation"])
+        self.assertEqual(result["severity_index"], 2)
+        self.assertEqual(result["severity_label"], "ASI-2 Very High Risk")
 
     def test_review_focus_items_are_deduplicated(self) -> None:
         interpretation = build_clinical_interpretation(
@@ -458,6 +465,14 @@ class ClinicalInterpretationTests(unittest.TestCase):
             "High model-estimated risk, but no major threshold-based vital-sign abnormality is detected in the provided features. Review model drivers, data completeness, and clinical context.",
         )
         self.assertEqual(interpretation["clinical_patterns"], [])
+
+    def test_severity_boundaries(self) -> None:
+        self.assertEqual(asclena_severity(0.85)["severity_index"], 1)
+        self.assertEqual(asclena_severity(0.70)["severity_index"], 2)
+        self.assertEqual(asclena_severity(0.55)["severity_index"], 3)
+        self.assertEqual(asclena_severity(0.40)["severity_index"], 4)
+        self.assertEqual(asclena_severity(0.20)["severity_index"], 5)
+        self.assertEqual(asclena_severity(0.19)["severity_index"], 6)
 
 
 if __name__ == "__main__":

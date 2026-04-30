@@ -116,8 +116,13 @@ class ModelMetadata(BaseModel):
 
 class PredictionResult(BaseModel):
     risk_score: float
+    display_risk_score: str
     predicted_target: int
     risk_label: str
+    severity_index: int
+    severity_label: str
+    severity_description: str
+    severity_scale_name: str
     threshold_used: float
 
 
