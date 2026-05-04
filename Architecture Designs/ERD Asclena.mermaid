@@ -292,6 +292,299 @@ erDiagram
     }
 
     %% ══════════════════════════════════════════════
+    %% PATIENT DOMAIN (Updated with 'race')
+    %% ══════════════════════════════════════════════
+
+    Patient {
+        bigint      patient_id              PK "subject_id"
+        varchar     mrn
+        varchar     first_name
+        varchar     last_name
+        varchar     gender
+        varchar     race                    "Added from edstays"
+        date        dob
+        varchar     blood_type
+        varchar     phone
+        varchar     email
+    }
+
+    %% ══════════════════════════════════════════════
+    %% CASE & EPISODE DOMAIN (Merged with edstays)
+    %% ══════════════════════════════════════════════
+
+    CaseRecord {
+        bigint      case_id                 PK
+        bigint      patient_id              FK
+        varchar     primary_diagnosis
+        boolean     is_active
+        decimal     risk_score
+    }
+
+    Episode {
+        bigint      episode_id              PK "stay_id"
+        bigint      case_id                 FK
+        bigint      hadm_id                 "Added from edstays"
+        datetime    intime                  "Added from edstays"
+        datetime    outtime                 "Added from edstays"
+        varchar     arrival_transport       "Added from edstays"
+        varchar     disposition             "Added from edstays"
+        varchar     status
+    }
+
+    %% ══════════════════════════════════════════════
+    %% CLINICAL DATA (Triage, Vitals, Diagnosis)
+    %% ══════════════════════════════════════════════
+
+    Triage {
+        bigint      triage_id               PK
+        bigint      episode_id              FK
+        decimal     temperature
+        integer     heartrate
+        integer     resprate
+        integer     o2sat
+        integer     sbp
+        integer     dbp
+        varchar     pain
+        integer     acuity
+        text        chiefcomplaint
+    }
+
+    VitalSign {
+        bigint      measurement_id          PK
+        bigint      episode_id              FK
+        datetime    charttime               "Added from vitalsign samples"
+        decimal     temperature             "Mapped directly"
+        integer     heartrate               "Mapped directly"
+        integer     resprate                "Mapped directly"
+        integer     o2sat                   "Mapped directly"
+        integer     sbp                     "Mapped directly"
+        integer     dbp                     "Mapped directly"
+        varchar     rhythm                  "Added from vitalsign samples"
+        varchar     pain                    "Added from vitalsign samples"
+        bigint      vital_type_id           FK "Original ERD column"
+        decimal     value                   "Original ERD column"
+        bigint      unit_id                 FK "Original ERD column"
+    }
+
+    Diagnosis {
+        bigint      diagnosis_id            PK
+        bigint      episode_id              FK
+        integer     seq_num                 "Added from diagnosis samples"
+        varchar     icd_code                "Added from diagnosis samples"
+        integer     icd_version             "Added from diagnosis samples"
+        varchar     icd_title               "Added from diagnosis samples"
+    }
+
+    %% ══════════════════════════════════════════════
+    %% MEDICATION LOGS (MedRecon & Pyxis)
+    %% ══════════════════════════════════════════════
+
+    MedRecon {
+        bigint      med_recon_id            PK
+        bigint      episode_id              FK
+        datetime    charttime
+        varchar     name
+        varchar     gsn
+        varchar     ndc
+        integer     etc_rn
+        varchar     etccode
+        text        etcdescription
+    }
+
+    Pyxis {
+        bigint      pyxis_id                PK
+        bigint      episode_id              FK
+        datetime    charttime
+        integer     med_rn
+        varchar     name
+        integer     gsn_rn
+        varchar     gsn
+    }
+
+    %% ══════════════════════════════════════════════
+    %% RELATIONSHIPS
+    %% ══════════════════════════════════════════════
+
+    Patient      ||--o{ CaseRecord     : "has"
+    CaseRecord   ||--o{ Episode        : "contains"
+    
+    Episode      ||--o| Triage         : "initial assessment"
+    Episode      ||--o{ VitalSign      : "monitors"
+    Episode      ||--o{ Diagnosis      : "recorded for"
+    Episode      ||--o{ MedRecon       : "history"
+    Episode      ||--o{ Pyxis          : "dispensed via"
+
+    %% ══════════════════════════════════════════════
+    %% 1. METADATA & LOOKUP TABLES
+    %% ══════════════════════════════════════════════
+
+    Ref_Transport {
+        integer     id              PK
+        varchar     name            "Ambulance, Walk-in, Helicopter..."
+    }
+
+    Ref_Disposition {
+        integer     id              PK
+        varchar     name            "Home, Admitted, Transfer, Expired..."
+    }
+
+    Ref_ICD {
+        varchar     icd_code        PK
+        integer     icd_version     "9 or 10"
+        varchar     description
+    }
+
+    Ref_Medication {
+        varchar     gsn             PK
+        varchar     name
+        varchar     drug_class
+    }
+
+    %% ══════════════════════════════════════════════
+    %% 2. AUTH & STAFF (With Audit Trail
+    %% ══════════════════════════════════════════════
+
+    User {
+        bigint      user_id         PK
+        varchar     email           UK
+        varchar     password
+        boolean     is_active
+        datetime    created_at      "Audit Trail"
+        datetime    updated_at
+    }
+
+    AuditLog {
+        bigint      audit_log_id    PK
+        bigint      user_id         FK
+        varchar     action
+        varchar     entity_type
+        bigint      entity_id
+        datetime    created_at
+    }
+
+    %% ══════════════════════════════════════════════
+    %% 3. PATIENT & CASE DOMAIN
+    %% ══════════════════════════════════════════════
+
+    Patient {
+        bigint      patient_id              PK
+        varchar     mrn                     UK
+        varchar     first_name
+        varchar     last_name
+        varchar     gender
+        varchar     race
+        date        dob
+        datetime    created_at
+    }
+
+    CaseRecord {
+        bigint      case_id                 PK
+        bigint      patient_id              FK
+        boolean     is_active
+        decimal     risk_score              "ML Predicted Score"
+        varchar     risk_level              "High/Med/Low"
+        datetime    created_at
+    }
+
+    Episode {
+        bigint      episode_id              PK
+        bigint      case_id                 FK
+        bigint      hadm_id                 "Hospital Admission ID"
+        datetime    intime                  "Indexed for Performance"
+        datetime    outtime
+        integer     transport_id            FK
+        integer     disposition_id          FK
+        varchar     status
+        datetime    created_at
+    }
+
+    %% ══════════════════════════════════════════════
+    %% 4. CLINICAL DATA (Performance Optimized)
+    %% ══════════════════════════════════════════════
+
+    Triage {
+        bigint      triage_id               PK
+        bigint      episode_id              FK
+        decimal     temperature
+        integer     heartrate
+        integer     resprate
+        integer     o2sat
+        integer     sbp
+        integer     dbp
+        decimal     shock_index             "Calculated Column"
+        integer     acuity
+        text        chiefcomplaint
+        datetime    created_at
+    }
+
+    VitalSign {
+        bigint      measurement_id          PK
+        bigint      episode_id              FK
+        datetime    charttime               "Indexed for Trends"
+        integer     sbp
+        integer     dbp
+        integer     heartrate
+        integer     resprate
+        integer     o2sat
+        varchar     rhythm
+        bigint      recorded_by             FK
+    }
+
+    Diagnosis {
+        bigint      diagnosis_id            PK
+        bigint      episode_id              FK
+        varchar     icd_code                FK
+        integer     seq_num                 "Primary/Secondary"
+        datetime    created_at
+    }
+
+    %% ══════════════════════════════════════════════
+    %% 5. MEDICATIONS (Med Details )
+    %% ══════════════════════════════════════════════
+
+    Pyxis {
+        bigint      pyxis_id                PK
+        bigint      episode_id              FK
+        varchar     gsn                     FK
+        datetime    charttime
+        decimal     dose
+        varchar     unit
+        varchar     route
+        varchar     status
+    }
+
+    MedRecon {
+        bigint      med_recon_id            PK
+        bigint      episode_id              FK
+        varchar     gsn                     FK
+        varchar     name
+        datetime    charttime
+    }
+
+    %% ══════════════════════════════════════════════
+    %% RELATIONSHIPS
+    %% ══════════════════════════════════════════════
+
+    User            ||--o{ AuditLog                : "generates"
+    Patient         ||--o{ CaseRecord              : "has"
+    CaseRecord      ||--o{ Episode                 : "contains"
+    
+    %% Clinical
+    Episode         ||--o| Triage                  : "initial assessment"
+    Episode         ||--o{ VitalSign               : "monitors"
+    Episode         ||--o{ Diagnosis               : "records"
+    Episode         ||--o{ Pyxis                   : "dispenses"
+    Episode         ||--o{ MedRecon                : "reconciles"
+
+    %% Lookups
+    Episode         ||--o{ Ref_Transport           : "arrives via"
+    Episode         ||--o{ Ref_Disposition         : "discharged to"
+    Diagnosis       ||--o{ Ref_ICD                 : "references"
+    Pyxis           ||--o{ Ref_Medication          : "dispenses"
+    MedRecon        ||--o{ Ref_Medication          : "history of"
+
+
+    %% ══════════════════════════════════════════════
     %% RELATIONSHIPS
     %% ══════════════════════════════════════════════
 
