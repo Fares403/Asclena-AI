@@ -154,6 +154,9 @@ erDiagram
         boolean     is_active
         decimal     risk_score
         varchar     risk_level
+        integer     total_prior_ed_visits
+        integer     total_prior_admissions
+        decimal     last_risk_score
         text        summary
         datetime    created_at
         datetime    updated_at
@@ -194,6 +197,12 @@ erDiagram
         integer     o2sat
         integer     sbp
         integer     dbp
+        boolean     temperature_missing
+        boolean     heartrate_missing
+        boolean     resprate_missing
+        boolean     o2sat_missing
+        boolean     sbp_missing
+        boolean     dbp_missing
         integer     pain_score
         varchar     pain_status
         integer     acuity
@@ -211,6 +220,12 @@ erDiagram
         integer     o2sat
         integer     sbp
         integer     dbp
+        boolean     temperature_missing
+        boolean     heartrate_missing
+        boolean     resprate_missing
+        boolean     o2sat_missing
+        boolean     sbp_missing
+        boolean     dbp_missing
         varchar     rhythm
         integer     pain_score
         varchar     pain_status
@@ -370,15 +385,18 @@ erDiagram
         bigint      patient_id               FK "optional history link (alias: subject_id)"
         varchar     model_name
         varchar     model_version
+        varchar     model_contract_version
         decimal     risk_score
         integer     predicted_target
         varchar     risk_label
+        varchar     clinical_priority
         integer     severity_index
         varchar     severity_label
         text        severity_description
         varchar     severity_scale_name
         decimal     threshold_used
-        text        top_features
+        text        top_features_json
+        text        interpretation_text
         datetime    created_at
     }
 
@@ -386,8 +404,23 @@ erDiagram
         bigint      importance_id            PK
         bigint      risk_prediction_id       FK
         varchar     feature_name
+        varchar     feature_category
         decimal     feature_value
         decimal     impact_score
+        varchar     impact_direction         "increases_risk|decreases_risk"
+        text        doctor_message
+    }
+
+    PredictionClinicalSignal {
+        bigint      signal_id                PK
+        bigint      risk_prediction_id       FK
+        varchar     signal_type
+        varchar     signal_code
+        text        signal_description
+        boolean     is_detected
+        varchar     severity
+        json        evidence_json
+        text        doctor_message
     }
 
     PredictionFeedback {
@@ -458,6 +491,7 @@ erDiagram
     Episode         ||--o{ RiskPrediction          : "predicted for stay"
     Patient         ||--o{ RiskPrediction          : "optional patient history"
     RiskPrediction  ||--o{ PredictionFeatureImportance : "explained by"
+    RiskPrediction  ||--o{ PredictionClinicalSignal : "emits clinical signals"
     RiskPrediction  ||--o| PredictionFeedback      : "reviewed by"
     Doctor          ||--o{ PredictionFeedback      : "provides"
 
@@ -474,6 +508,8 @@ erDiagram
     %% - Add DB unique constraint: Diagnosis(episode_id, seq_num) for ordered diagnoses
     %% - Add DB check constraints for pain_status allowed values
     %%   ('asleep','unable','uta','unknown')
+    %% - Add DB check constraints for PredictionFeatureImportance.impact_direction
+    %%   ('increases_risk','decreases_risk')
     %% - Validate timeline in processing: charttime between Episode.intime and Episode.outtime
     %% - feature engineering is performed in application memory only
     %% - no persisted feature-store table in database
@@ -504,4 +540,5 @@ style MedRecon fill:#ECFEFF,stroke:#14B8A6,color:#0F766E
 %% =========================
 style RiskPrediction fill:#FFFBEB,stroke:#F59E0B,color:#92400E
 style PredictionFeatureImportance fill:#FFFBEB,stroke:#F59E0B,color:#92400E
+style PredictionClinicalSignal fill:#FFFBEB,stroke:#F59E0B,color:#92400E
 style PredictionFeedback fill:#FFFBEB,stroke:#F59E0B,color:#92400E
