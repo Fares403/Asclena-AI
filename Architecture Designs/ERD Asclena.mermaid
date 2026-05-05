@@ -382,6 +382,23 @@ erDiagram
         datetime    created_at
     }
 
+    PredictionFeatureImportance {
+        bigint      importance_id            PK
+        bigint      risk_prediction_id       FK
+        varchar     feature_name
+        decimal     feature_value
+        decimal     impact_score
+    }
+
+    PredictionFeedback {
+        bigint      feedback_id              PK
+        bigint      risk_prediction_id       FK,UK
+        bigint      doctor_id                FK
+        boolean     is_clinically_accurate
+        text        clinical_notes
+        datetime    created_at
+    }
+
     %% =========================================================
     %% RELATIONSHIPS
     %% =========================================================
@@ -440,6 +457,9 @@ erDiagram
     %% ML output persistence
     Episode         ||--o{ RiskPrediction          : "predicted for stay"
     Patient         ||--o{ RiskPrediction          : "optional patient history"
+    RiskPrediction  ||--o{ PredictionFeatureImportance : "explained by"
+    RiskPrediction  ||--o| PredictionFeedback      : "reviewed by"
+    Doctor          ||--o{ PredictionFeedback      : "provides"
 
     %% NOTE:
     %% - features are extracted dynamically during inference from raw tables:
@@ -483,3 +503,5 @@ style MedRecon fill:#ECFEFF,stroke:#14B8A6,color:#0F766E
 %% AI / ML DOMAIN (Amber - Attention)
 %% =========================
 style RiskPrediction fill:#FFFBEB,stroke:#F59E0B,color:#92400E
+style PredictionFeatureImportance fill:#FFFBEB,stroke:#F59E0B,color:#92400E
+style PredictionFeedback fill:#FFFBEB,stroke:#F59E0B,color:#92400E
