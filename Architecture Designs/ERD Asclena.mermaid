@@ -1,388 +1,246 @@
-        %%{init: {'theme': 'base', 'themeVariables': {
-        'background': '#F8FAFC',
-        'primaryColor': '#E3F2FD',
-        'primaryTextColor': '#0F172A',
-        'primaryBorderColor': '#1E88E5',
-        'lineColor': '#334155',
-        'secondaryColor': '#E8F5E9',
-        'tertiaryColor': '#FFF3E0'
-    }}}%%
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'background': '#F8FAFC',
+    'primaryColor': '#FFFFFF',
+    'primaryTextColor': '#0F172A',
+    'primaryBorderColor': '#E2E8F0',
+    'lineColor': '#CBD5E1',
+    'secondaryColor': '#F0FDFA',
+    'tertiaryColor': '#FFFBEB',
+    'fontFamily': 'Inter, Roboto, "Segoe UI", Arial, sans-serif',
+    'fontSize': '14px'
+  },
+  'themeCSS': '
+    svg {
+      background-color: #F8FAFC !important;
+    }
+    .mermaid {
+      background-color: #F8FAFC !important;
+    }
+    .er .entityBox {
+      rx: 14px;
+      ry: 14px;
+      stroke-width: 1.2px;
+      fill: #FFFFFF;
+      filter: drop-shadow(0 3px 8px rgba(15, 23, 42, 0.06));
+    }
+    .er .attributeBoxEven,
+    .er .attributeBoxOdd {
+      fill-opacity: 0.98;
+    }
+    .er .entityLabel {
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .er .relationshipLabelBox {
+      fill: #FFFFFF;
+      stroke: #E2E8F0;
+      opacity: 0.96;
+      rx: 6px;
+      ry: 6px;
+    }
+    .er .relationshipLabel {
+      fill: #475569;
+      font-weight: 500;
+    }
+    .er line {
+      stroke-width: 1.3px;
+    }
+  '
+}}%%
 erDiagram
 
-    %% ══════════════════════════════════════════════
-    %% AUTH & USER DOMAIN
-    %% ══════════════════════════════════════════════
+    %% =========================================================
+    %% AUTH & STAFF DOMAIN
+    %% =========================================================
 
     User {
-        bigint      user_id         PK
+        bigint      user_id                  PK
         varchar     first_name
         varchar     last_name
-        varchar     email
+        varchar     email                    UK
         varchar     password
         varchar     phone
         boolean     is_active
         datetime    created_at
+        datetime    updated_at
     }
 
     Role {
-        bigint      role_id         PK
+        bigint      role_id                  PK
         varchar     role_name
     }
 
     UserRole {
-        bigint      user_id         PK,FK
-        bigint      role_id         PK,FK
+        bigint      user_id                  PK,FK
+        bigint      role_id                  PK,FK
         datetime    assigned_at
     }
 
     Permission {
-        bigint      permission_id   PK
+        bigint      permission_id            PK
         varchar     code
     }
 
     RolePermission {
-        bigint      role_id         PK,FK
-        bigint      permission_id   PK,FK
+        bigint      role_id                  PK,FK
+        bigint      permission_id            PK,FK
     }
 
     Screen {
-        bigint      screen_id               PK
+        bigint      screen_id                PK
         varchar     code
         varchar     path
         varchar     module
-        bigint      required_permission_id  FK
+        bigint      required_permission_id   FK
         boolean     is_active
     }
 
     AuditLog {
-        bigint      audit_log_id    PK
-        bigint      user_id         FK
+        bigint      audit_log_id             PK
+        bigint      user_id                  FK
         varchar     action
         varchar     entity_type
         bigint      entity_id
         datetime    created_at
     }
 
-    %% ══════════════════════════════════════════════
-    %% STAFF PROFILES
-    %% ══════════════════════════════════════════════
-
     Doctor {
-        bigint      doctor_id           PK,FK
+        bigint      doctor_id                PK,FK
         varchar     specialty
         varchar     license_number
     }
 
     LabStaff {
-        bigint      lab_staff_id        PK,FK
+        bigint      lab_staff_id             PK,FK
         varchar     lab_department
     }
 
     RadiologyStaff {
-        bigint      radiology_staff_id  PK,FK
+        bigint      radiology_staff_id       PK,FK
         varchar     imaging_department
     }
 
     Receptionist {
-        bigint      receptionist_id     PK,FK
+        bigint      receptionist_id          PK,FK
     }
 
-    %% ══════════════════════════════════════════════
-    %% PATIENT DOMAIN
-    %% ══════════════════════════════════════════════
+    %% =========================================================
+    %% CORE PATIENT / CASE / EPISODE DOMAIN
+    %% case = patient file; every ED visit => new episode
+    %% =========================================================
 
     Patient {
-        bigint      patient_id              PK
-        varchar     mrn
+        bigint      patient_id               PK "alias: subject_id"
+        varchar     mrn                      UK
         varchar     first_name
         varchar     last_name
         varchar     national_id
         date        dob
         varchar     gender
+        varchar     race
         varchar     phone
         varchar     email
         varchar     address
         varchar     blood_type
-        decimal     initial_weight
-        decimal     initial_height
-        decimal     initial_BMI
-        varchar     initial_blood_pressure
-    }
-
-    PatientInsurance {
-        bigint      insurance_id    PK
-        bigint      patient_id      FK
-        varchar     company
-        varchar     policy_number
-        varchar     class
-        date        expiry_date
-        boolean     is_active
-    }
-
-    PatientEmergencyContact {
-        bigint      contact_id      PK
-        bigint      patient_id      FK
-        varchar     name
-        varchar     relationship
-        varchar     phone
-        boolean     is_primary
         datetime    created_at
+        datetime    updated_at
     }
-
-    PatientAllergy {
-        bigint      allergy_id      PK
-        bigint      patient_id      FK
-        varchar     allergen
-        varchar     severity
-        varchar     reaction
-        boolean     is_active
-    }
-
-    %% ══════════════════════════════════════════════
-    %% CASE & EPISODE DOMAIN
-    %% ══════════════════════════════════════════════
 
     CaseRecord {
-        bigint      case_id             PK
-        bigint      patient_id          FK
-        varchar     primary_diagnosis
-        date        start_date
-        date        end_date
+        bigint      case_id                  PK
+        bigint      patient_id               FK,UK
         boolean     is_active
         decimal     risk_score
         varchar     risk_level
         text        summary
+        datetime    created_at
+        datetime    updated_at
     }
 
     Episode {
-        bigint      episode_id      PK
-        bigint      case_id         FK
-        date        start_date
-        date        end_date
+        bigint      episode_id               PK "alias: stay_id"
+        bigint      case_id                  FK
+        bigint      hadm_id                  "nullable"
+        datetime    intime
+        datetime    outtime
+        varchar     arrival_transport
+        varchar     disposition
         varchar     status
+        datetime    created_at
+        datetime    updated_at
     }
 
     EpisodeClinicalNote {
-        bigint      note_id         PK
-        bigint      episode_id      FK
+        bigint      note_id                  PK
+        bigint      episode_id               FK
         varchar     note_type
         text        content
-        bigint      created_by      FK
+        bigint      created_by               FK
         datetime    created_at
     }
 
-    %% ══════════════════════════════════════════════
-    %% VITALS DOMAIN
-    %% ══════════════════════════════════════════════
-
-    VitalType {
-        bigint      vital_type_id   PK
-        varchar     code
-        varchar     name
-    }
-
-    Unit {
-        bigint      unit_id         PK
-        varchar     code
-        varchar     name
-    }
-
-    VitalSign {
-        bigint      measurement_id  PK
-        bigint      episode_id      FK
-        bigint      vital_type_id   FK
-        decimal     value
-        bigint      unit_id         FK
-        datetime    measured_at
-        bigint      recorded_by     FK
-    }
-
-    %% ══════════════════════════════════════════════
-    %% LAB DOMAIN
-    %% ══════════════════════════════════════════════
-
-    LabOrder {
-        bigint      lab_order_id    PK
-        bigint      episode_id      FK
-        bigint      ordered_by      FK
-        datetime    order_date
-        varchar     status
-        varchar     priority
-    }
-
-    LabResult {
-        bigint      lab_result_id   PK
-        bigint      lab_order_id    FK
-        varchar     status
-        bigint      reviewed_by     FK
-        datetime    reviewed_at
-    }
-
-    LabResultItem {
-        bigint      lab_result_item_id  PK
-        bigint      lab_result_id       FK
-        varchar     analyte_code
-        varchar     value
-        varchar     unit
-        varchar     reference_range_text
-        varchar     flag
-    }
-
-    %% ══════════════════════════════════════════════
-    %% IMAGING DOMAIN
-    %% ══════════════════════════════════════════════
-
-    ImagingOrder {
-        bigint      imaging_order_id    PK
-        bigint      episode_id          FK
-        bigint      ordered_by          FK
-        varchar     modality
-        varchar     body_part
-        varchar     status
-        datetime    order_date
-    }
-
-    ImagingResult {
-        bigint      imaging_result_id   PK
-        bigint      imaging_order_id    FK
-        text        findings
-        text        conclusion
-        text        report_text
-        bigint      reviewed_by         FK
-        datetime    reviewed_at
-    }
-
-    %% ══════════════════════════════════════════════
-    %% PRESCRIPTION DOMAIN
-    %% ══════════════════════════════════════════════
-
-    Medication {
-        bigint      medication_id   PK
-        varchar     name
-    }
-
-    Prescription {
-        bigint      prescription_id PK
-        bigint      episode_id      FK
-        bigint      medication_id   FK
-        varchar     dose
-        varchar     frequency
-        varchar     duration
-        varchar     status
-        bigint      prescribed_by   FK
-        datetime    start_date
-        datetime    end_date
-    }
-
-    %% ══════════════════════════════════════════════
-    %% APPOINTMENT DOMAIN
-    %% ══════════════════════════════════════════════
-
-    Appointment {
-        bigint      appointment_id      PK
-        bigint      patient_id          FK
-        bigint      doctor_id           FK
-        bigint      receptionist_id     FK
-        datetime    scheduled_date_time
-        varchar     status
-        datetime    check_in_time
-        datetime    start_time
-        datetime    end_time
-        datetime    created_at
-    }
-
-    %% ══════════════════════════════════════════════
-    %% PATIENT DOMAIN (Updated with 'race')
-    %% ══════════════════════════════════════════════
-
-    Patient {
-        bigint      patient_id              PK "subject_id"
-        varchar     mrn
-        varchar     first_name
-        varchar     last_name
-        varchar     gender
-        varchar     race                    "Added from edstays"
-        date        dob
-        varchar     blood_type
-        varchar     phone
-        varchar     email
-    }
-
-    %% ══════════════════════════════════════════════
-    %% CASE & EPISODE DOMAIN (Merged with edstays)
-    %% ══════════════════════════════════════════════
-
-    CaseRecord {
-        bigint      case_id                 PK
-        bigint      patient_id              FK
-        varchar     primary_diagnosis
-        boolean     is_active
-        decimal     risk_score
-    }
-
-    Episode {
-        bigint      episode_id              PK "stay_id"
-        bigint      case_id                 FK
-        bigint      hadm_id                 "Added from edstays"
-        datetime    intime                  "Added from edstays"
-        datetime    outtime                 "Added from edstays"
-        varchar     arrival_transport       "Added from edstays"
-        varchar     disposition             "Added from edstays"
-        varchar     status
-    }
-
-    %% ══════════════════════════════════════════════
-    %% CLINICAL DATA (Triage, Vitals, Diagnosis)
-    %% ══════════════════════════════════════════════
+    %% =========================================================
+    %% CLINICAL FEATURES DOMAIN (aligned with model samples)
+    %% =========================================================
 
     Triage {
-        bigint      triage_id               PK
-        bigint      episode_id              FK
+        bigint      triage_id                PK
+        bigint      episode_id               FK,UK
         decimal     temperature
         integer     heartrate
         integer     resprate
         integer     o2sat
         integer     sbp
         integer     dbp
-        varchar     pain
+        integer     pain_score
+        varchar     pain_status
         integer     acuity
         text        chiefcomplaint
+        datetime    created_at
     }
 
     VitalSign {
-        bigint      measurement_id          PK
-        bigint      episode_id              FK
-        datetime    charttime               "Added from vitalsign samples"
-        decimal     temperature             "Mapped directly"
-        integer     heartrate               "Mapped directly"
-        integer     resprate                "Mapped directly"
-        integer     o2sat                   "Mapped directly"
-        integer     sbp                     "Mapped directly"
-        integer     dbp                     "Mapped directly"
-        varchar     rhythm                  "Added from vitalsign samples"
-        varchar     pain                    "Added from vitalsign samples"
-        bigint      vital_type_id           FK "Original ERD column"
-        decimal     value                   "Original ERD column"
-        bigint      unit_id                 FK "Original ERD column"
+        bigint      measurement_id           PK
+        bigint      episode_id               FK
+        datetime    charttime
+        decimal     temperature
+        integer     heartrate
+        integer     resprate
+        integer     o2sat
+        integer     sbp
+        integer     dbp
+        varchar     rhythm
+        integer     pain_score
+        varchar     pain_status
+        bigint      recorded_by              FK
     }
 
     Diagnosis {
-        bigint      diagnosis_id            PK
-        bigint      episode_id              FK
-        integer     seq_num                 "Added from diagnosis samples"
-        varchar     icd_code                "Added from diagnosis samples"
-        integer     icd_version             "Added from diagnosis samples"
-        varchar     icd_title               "Added from diagnosis samples"
+        bigint      diagnosis_id             PK
+        bigint      episode_id               FK
+        integer     seq_num                  "ordered within episode"
+        varchar     icd_code
+        integer     icd_version
+        varchar     icd_title
+        datetime    created_at
     }
 
-    %% ══════════════════════════════════════════════
-    %% MEDICATION LOGS (MedRecon & Pyxis)
-    %% ══════════════════════════════════════════════
+    Pyxis {
+        bigint      pyxis_id                 PK
+        bigint      episode_id               FK
+        datetime    charttime
+        integer     med_rn
+        varchar     name
+        integer     gsn_rn
+        varchar     gsn
+    }
 
     MedRecon {
-        bigint      med_recon_id            PK
-        bigint      episode_id              FK
-        datetime    charttime
+        bigint      med_recon_id             PK
+        bigint      episode_id               FK
+        datetime    charttime                "snapshot_time"
         varchar     name
         varchar     gsn
         varchar     ndc
@@ -391,255 +249,237 @@ erDiagram
         text        etcdescription
     }
 
-    Pyxis {
-        bigint      pyxis_id                PK
-        bigint      episode_id              FK
-        datetime    charttime
-        integer     med_rn
-        varchar     name
-        integer     gsn_rn
-        varchar     gsn
-    }
+    %% =========================================================
+    %% OTHER CLINICAL DOMAIN TABLES
+    %% =========================================================
 
-    %% ══════════════════════════════════════════════
-    %% RELATIONSHIPS
-    %% ══════════════════════════════════════════════
-
-    Patient      ||--o{ CaseRecord     : "has"
-    CaseRecord   ||--o{ Episode        : "contains"
-    
-    Episode      ||--o| Triage         : "initial assessment"
-    Episode      ||--o{ VitalSign      : "monitors"
-    Episode      ||--o{ Diagnosis      : "recorded for"
-    Episode      ||--o{ MedRecon       : "history"
-    Episode      ||--o{ Pyxis          : "dispensed via"
-
-    %% ══════════════════════════════════════════════
-    %% 1. METADATA & LOOKUP TABLES
-    %% ══════════════════════════════════════════════
-
-    Ref_Transport {
-        integer     id              PK
-        varchar     name            "Ambulance, Walk-in, Helicopter..."
-    }
-
-    Ref_Disposition {
-        integer     id              PK
-        varchar     name            "Home, Admitted, Transfer, Expired..."
-    }
-
-    Ref_ICD {
-        varchar     icd_code        PK
-        integer     icd_version     "9 or 10"
-        varchar     description
-    }
-
-    Ref_Medication {
-        varchar     gsn             PK
-        varchar     name
-        varchar     drug_class
-    }
-
-    %% ══════════════════════════════════════════════
-    %% 2. AUTH & STAFF (With Audit Trail
-    %% ══════════════════════════════════════════════
-
-    User {
-        bigint      user_id         PK
-        varchar     email           UK
-        varchar     password
+    PatientInsurance {
+        bigint      insurance_id             PK
+        bigint      patient_id               FK
+        varchar     company
+        varchar     policy_number
+        varchar     class
+        date        expiry_date
         boolean     is_active
-        datetime    created_at      "Audit Trail"
-        datetime    updated_at
     }
 
-    AuditLog {
-        bigint      audit_log_id    PK
-        bigint      user_id         FK
-        varchar     action
-        varchar     entity_type
-        bigint      entity_id
+    PatientEmergencyContact {
+        bigint      contact_id               PK
+        bigint      patient_id               FK
+        varchar     name
+        varchar     relationship
+        varchar     phone
+        boolean     is_primary
         datetime    created_at
     }
 
-    %% ══════════════════════════════════════════════
-    %% 3. PATIENT & CASE DOMAIN
-    %% ══════════════════════════════════════════════
-
-    Patient {
-        bigint      patient_id              PK
-        varchar     mrn                     UK
-        varchar     first_name
-        varchar     last_name
-        varchar     gender
-        varchar     race
-        date        dob
-        datetime    created_at
-    }
-
-    CaseRecord {
-        bigint      case_id                 PK
-        bigint      patient_id              FK
+    PatientAllergy {
+        bigint      allergy_id               PK
+        bigint      patient_id               FK
+        varchar     allergen
+        varchar     severity
+        varchar     reaction
         boolean     is_active
-        decimal     risk_score              "ML Predicted Score"
-        varchar     risk_level              "High/Med/Low"
-        datetime    created_at
     }
 
-    Episode {
-        bigint      episode_id              PK
-        bigint      case_id                 FK
-        bigint      hadm_id                 "Hospital Admission ID"
-        datetime    intime                  "Indexed for Performance"
-        datetime    outtime
-        integer     transport_id            FK
-        integer     disposition_id          FK
+    LabOrder {
+        bigint      lab_order_id             PK
+        bigint      episode_id               FK
+        bigint      ordered_by               FK
+        datetime    order_date
         varchar     status
-        datetime    created_at
+        varchar     priority
     }
 
-    %% ══════════════════════════════════════════════
-    %% 4. CLINICAL DATA (Performance Optimized)
-    %% ══════════════════════════════════════════════
-
-    Triage {
-        bigint      triage_id               PK
-        bigint      episode_id              FK
-        decimal     temperature
-        integer     heartrate
-        integer     resprate
-        integer     o2sat
-        integer     sbp
-        integer     dbp
-        decimal     shock_index             "Calculated Column"
-        integer     acuity
-        text        chiefcomplaint
-        datetime    created_at
+    LabResult {
+        bigint      lab_result_id            PK
+        bigint      lab_order_id             FK
+        varchar     status
+        bigint      reviewed_by              FK
+        datetime    reviewed_at
     }
 
-    VitalSign {
-        bigint      measurement_id          PK
-        bigint      episode_id              FK
-        datetime    charttime               "Indexed for Trends"
-        integer     sbp
-        integer     dbp
-        integer     heartrate
-        integer     resprate
-        integer     o2sat
-        varchar     rhythm
-        bigint      recorded_by             FK
-    }
-
-    Diagnosis {
-        bigint      diagnosis_id            PK
-        bigint      episode_id              FK
-        varchar     icd_code                FK
-        integer     seq_num                 "Primary/Secondary"
-        datetime    created_at
-    }
-
-    %% ══════════════════════════════════════════════
-    %% 5. MEDICATIONS (Med Details )
-    %% ══════════════════════════════════════════════
-
-    Pyxis {
-        bigint      pyxis_id                PK
-        bigint      episode_id              FK
-        varchar     gsn                     FK
-        datetime    charttime
-        decimal     dose
+    LabResultItem {
+        bigint      lab_result_item_id       PK
+        bigint      lab_result_id            FK
+        varchar     analyte_code
+        varchar     value
         varchar     unit
-        varchar     route
+        varchar     reference_range_text
+        varchar     flag
+    }
+
+    ImagingOrder {
+        bigint      imaging_order_id         PK
+        bigint      episode_id               FK
+        bigint      ordered_by               FK
+        varchar     modality
+        varchar     body_part
         varchar     status
+        datetime    order_date
     }
 
-    MedRecon {
-        bigint      med_recon_id            PK
-        bigint      episode_id              FK
-        varchar     gsn                     FK
+    ImagingResult {
+        bigint      imaging_result_id        PK
+        bigint      imaging_order_id         FK
+        text        findings
+        text        conclusion
+        text        report_text
+        bigint      reviewed_by              FK
+        datetime    reviewed_at
+    }
+
+    Medication {
+        bigint      medication_id            PK
         varchar     name
-        datetime    charttime
     }
 
-    %% ══════════════════════════════════════════════
-    %% RELATIONSHIPS
-    %% ══════════════════════════════════════════════
+    Prescription {
+        bigint      prescription_id          PK
+        bigint      episode_id               FK
+        bigint      medication_id            FK
+        varchar     dose
+        varchar     frequency
+        varchar     duration
+        varchar     status
+        bigint      prescribed_by            FK
+        datetime    start_date
+        datetime    end_date
+    }
 
+    Appointment {
+        bigint      appointment_id           PK
+        bigint      patient_id               FK
+        bigint      doctor_id                FK
+        bigint      receptionist_id          FK
+        datetime    scheduled_date_time
+        varchar     status
+        datetime    check_in_time
+        datetime    start_time
+        datetime    end_time
+        datetime    created_at
+    }
+
+    %% =========================================================
+    %% ANALYTICS / ML DOMAIN
+    %% =========================================================
+
+    RiskPrediction {
+        bigint      risk_prediction_id       PK
+        bigint      episode_id               FK "primary link (alias: stay_id)"
+        bigint      patient_id               FK "optional history link (alias: subject_id)"
+        varchar     model_name
+        varchar     model_version
+        decimal     risk_score
+        integer     predicted_target
+        varchar     risk_label
+        integer     severity_index
+        varchar     severity_label
+        text        severity_description
+        varchar     severity_scale_name
+        decimal     threshold_used
+        text        top_features
+        datetime    created_at
+    }
+
+    %% =========================================================
+    %% RELATIONSHIPS
+    %% =========================================================
+
+    %% Auth
+    User            ||--o{ UserRole                : "assigned to"
+    Role            ||--o{ UserRole                : "contains users"
+    Role            ||--o{ RolePermission          : "grants"
+    Permission      ||--o{ RolePermission          : "included in"
+    Permission      ||--o{ Screen                  : "required for"
     User            ||--o{ AuditLog                : "generates"
-    Patient         ||--o{ CaseRecord              : "has"
-    CaseRecord      ||--o{ Episode                 : "contains"
-    
-    %% Clinical
-    Episode         ||--o| Triage                  : "initial assessment"
-    Episode         ||--o{ VitalSign               : "monitors"
-    Episode         ||--o{ Diagnosis               : "records"
-    Episode         ||--o{ Pyxis                   : "dispenses"
-    Episode         ||--o{ MedRecon                : "reconciles"
 
-    %% Lookups
-    Episode         ||--o{ Ref_Transport           : "arrives via"
-    Episode         ||--o{ Ref_Disposition         : "discharged to"
-    Diagnosis       ||--o{ Ref_ICD                 : "references"
-    Pyxis           ||--o{ Ref_Medication          : "dispenses"
-    MedRecon        ||--o{ Ref_Medication          : "history of"
+    %% Staff profiles
+    User            ||--o| Doctor                  : "profile"
+    User            ||--o| LabStaff                : "profile"
+    User            ||--o| RadiologyStaff          : "profile"
+    User            ||--o| Receptionist            : "profile"
 
+    %% Patient / case / episodes
+    Patient         ||--|| CaseRecord              : "has one case file"
+    CaseRecord      ||--o{ Episode                 : "contains episodes"
+    Episode         ||--o{ EpisodeClinicalNote     : "has notes"
+    User            ||--o{ EpisodeClinicalNote     : "created by"
 
-    %% ══════════════════════════════════════════════
-    %% RELATIONSHIPS
-    %% ══════════════════════════════════════════════
+    %% ED clinical data used by feature engineering
+    Episode         ||--o| Triage                  : "initial triage"
+    Episode         ||--o{ VitalSign               : "vitals over time"
+    Episode         ||--o{ Diagnosis               : "diagnoses"
+    Episode         ||--o{ Pyxis                   : "dispensed meds"
+    Episode         ||--o{ MedRecon                : "med reconciliation snapshots"
+    User            ||--o{ VitalSign               : "recorded by"
 
-    %% Auth & Roles
-    User            ||--o{    UserRole                : "assigned to"
-    Role            ||--o{    UserRole                : "assigned to"
-    Role            ||--o{    RolePermission          : "grants"
-    Permission      ||--o{    RolePermission          : "included in"
-    Permission      ||--o{    Screen                  : "required for"
-    User            ||--o{    AuditLog                : "generates"
+    %% Other clinical domains
+    Patient         ||--o{ PatientInsurance        : "has"
+    Patient         ||--o{ PatientEmergencyContact : "has"
+    Patient         ||--o{ PatientAllergy          : "has"
+    Patient         ||--o{ Appointment             : "books"
+    Doctor          ||--o{ Appointment             : "sees"
+    Receptionist    ||--o{ Appointment             : "manages"
 
-    %% Staff Profiles (extend User)
-    User            ||--o|    Doctor                  : "profile"
-    User            ||--o|    LabStaff                : "profile"
-    User            ||--o|    RadiologyStaff          : "profile"
-    User            ||--o|    Receptionist            : "profile"
+    Episode         ||--o{ LabOrder                : "orders"
+    Doctor          ||--o{ LabOrder                : "ordered by"
+    LabOrder        ||--o| LabResult               : "produces"
+    LabResult       ||--o{ LabResultItem           : "contains"
+    LabStaff        ||--o{ LabResult               : "reviews"
 
-    %% Patient relationships
-    Patient         ||--o{    PatientInsurance        : "has"
-    Patient         ||--o{    PatientEmergencyContact : "has"
-    Patient         ||--o{    PatientAllergy          : "has"
-    Patient         ||--o{    CaseRecord              : "has"
-    Patient         ||--o{    Appointment             : "books"
+    Episode         ||--o{ ImagingOrder            : "orders"
+    Doctor          ||--o{ ImagingOrder            : "ordered by"
+    ImagingOrder    ||--o| ImagingResult           : "produces"
+    RadiologyStaff  ||--o{ ImagingResult           : "reviews"
 
-    %% Case & Episode
-    CaseRecord      ||--o{    Episode                 : "contains"
-    Episode         ||--o{    EpisodeClinicalNote     : "has"
+    Episode         ||--o{ Prescription            : "includes"
+    Medication      ||--o{ Prescription            : "used in"
+    Doctor          ||--o{ Prescription            : "prescribes"
 
-    %% Vitals
-    Episode         ||--o{    VitalSign               : "records"
-    VitalType       ||--o{    VitalSign               : "defines"
-    Unit            ||--o{    VitalSign               : "uses"
-    User            ||--o{    VitalSign               : "recorded by"
+    %% ML output persistence
+    Episode         ||--o{ RiskPrediction          : "predicted for stay"
+    Patient         ||--o{ RiskPrediction          : "optional patient history"
 
-    %% Lab
-    Episode         ||--o{    LabOrder                : "orders"
-    Doctor          ||--o{    LabOrder                : "ordered by"
-    LabOrder        ||--o|    LabResult               : "produces"
-    LabResult       ||--o{    LabResultItem           : "contains"
-    LabStaff        ||--o{    LabResult               : "reviews"
+    %% NOTE:
+    %% - features are extracted dynamically during inference from raw tables:
+    %%   Triage, VitalSign, Diagnosis, Pyxis, and MedRecon
+    %% - Episode (stay_id) is the anchor for ED clinical feature tables
+    %% - Naming bridge for current ML pipeline:
+    %%   episode_id <-> stay_id
+    %%   patient_id <-> subject_id
+    %% - During integration, keep a compatibility layer (view/alias) until
+    %%   SQL + modeling code are fully migrated to episode_id/patient_id names
+    %% - Add DB index: VitalSign(episode_id, charttime) for time-series retrieval
+    %% - Add DB unique constraint: Diagnosis(episode_id, seq_num) for ordered diagnoses
+    %% - Add DB check constraints for pain_status allowed values
+    %%   ('asleep','unable','uta','unknown')
+    %% - Validate timeline in processing: charttime between Episode.intime and Episode.outtime
+    %% - feature engineering is performed in application memory only
+    %% - no persisted feature-store table in database
 
-    %% Imaging
-    Episode         ||--o{    ImagingOrder            : "orders"
-    Doctor          ||--o{    ImagingOrder            : "ordered by"
-    ImagingOrder    ||--o|    ImagingResult           : "produces"
-    RadiologyStaff  ||--o{    ImagingResult           : "reviews"
+    %% =========================================================
+    %% VISUAL STYLING (High-Tech Presentation)
+    %% =========================================================
 
-    %% Prescriptions
-    Episode         ||--o{    Prescription            : "includes"
-    Medication      ||--o{    Prescription            : "used in"
-    Doctor          ||--o{    Prescription            : "prescribes"
+    %% Core domain (primary: Medical Blue / Navy)
+%% =========================
+%% CORE DOMAIN (Primary Blue - Soft)
+%% =========================
+style Patient fill:#E8F0FE,stroke:#3B82F6,color:#1E3A8A
+style CaseRecord fill:#DBEAFE,stroke:#60A5FA,color:#1E3A8A
+style Episode fill:#E0E7FF,stroke:#6366F1,color:#1E3A8A
 
-    %% Appointments
-    Doctor          ||--o{    Appointment             : "sees"
-    Receptionist    ||--o{    Appointment             : "manages"
+%% =========================
+%% CLINICAL DOMAIN (Teal - Clean Medical)
+%% =========================
+style Triage fill:#ECFEFF,stroke:#14B8A6,color:#0F766E
+style VitalSign fill:#F0FDFA,stroke:#2DD4BF,color:#115E59
+style Diagnosis fill:#ECFEFF,stroke:#14B8A6,color:#0F766E
+style Pyxis fill:#F0FDFA,stroke:#2DD4BF,color:#115E59
+style MedRecon fill:#ECFEFF,stroke:#14B8A6,color:#0F766E
 
-    %% Clinical Notes
-    User            ||--o{    EpisodeClinicalNote     : "created by"
+%% =========================
+%% AI / ML DOMAIN (Amber - Attention)
+%% =========================
+style RiskPrediction fill:#FFFBEB,stroke:#F59E0B,color:#92400E
