@@ -1,0 +1,54 @@
+graph TD
+    %% Define Styles & Colors
+    classDef ehr fill:#fdfdfd,stroke:#1e293b,stroke-width:2px;
+    classDef gateway fill:#dcfd8b,stroke:#1e293b,stroke-width:2px;
+    classDef broker fill:#bc84ee,stroke:#fff,stroke-width:2px,color:#fff;
+    classDef worker fill:#ff823a,stroke:#fff,stroke-width:2px,color:#fff;
+    classDef db fill:#22d3ee,stroke:#1e293b,stroke-width:2px;
+    classDef guard fill:#ef4444,stroke:#fff,stroke-width:2px,color:#fff;
+
+    %% --- STAGE 1: DATA INGESTION & INTEROPERABILITY ---
+    subgraph STAGE_1 [1. EHR Interoperability Layer]
+        EHR[(Hospital EHR / PACS)] -->|Raw Clinical Data| FHIR[Smart FHIR R4 Server]
+        FHIR -->|Structured JSON Bundles| Client[Doctor UI / Dashboard]
+    end
+    class EHR,FHIR ehr;
+
+    %% --- STAGE 2: DECOUPLED ASYNC PIPELINE ---
+    subgraph STAGE_2 [2. Asynchronous Async Orchestration]
+        Client -->|1. Submit Patient ID / Query| API[FastAPI Gateway]
+        API -->|2. Dispatch Heavy Background Job| Redis{Redis Message Broker}
+        Redis -->|3. Consume & Execute Task| Celery[Celery Background Worker]
+        API -->|Immediate Feedback| UI_Status[Return Async Task ID to UI]
+    end
+    class API gateway;
+    class Redis broker;
+    class Celery worker;
+
+    %% --- STAGE 3: VECTOR STORAGE & MATRIX CHUNKING ---
+    subgraph STAGE_3 [3. Semantic Memory & Embedding]
+        Celery -->|Fetch All Patient Resources| FHIR
+        Celery -->|4. Object-Level Matrix Chunking| Chunk[Matrix Grouping B_size=15]
+        Chunk -->|5. Generate 768-Dim Vectors| Nomic[Nomic-Embed-Text Engine]
+        Nomic -->|6. Upsert Embeddings| Chroma[(ChromaDB Local Vector DB)]
+    end
+    class Chroma db;
+
+    %% --- STAGE 4: RETRIEVAL & ZERO-INFERENCE GUARDRAILS ---
+    subgraph STAGE_4 [4. Safe Clinical Generation]
+        Client -->|7. Ask Clinical Question| API
+        API -->|8. Vectorize Query & KNN Search| Chroma
+        Chroma -->|9. Return Top 15 Relevant Chunks| API
+        API -->|10. Enforce Zero-Inference Policy| Guardrails[System Prompt Guardrails]
+        Guardrails -->|11. Deterministic Prompt Context| Llama[Local LLaMA-3.2-1B]
+        Llama -->|12. 100% Verified Narrative Summary| Client
+    end
+    class Guardrails guard;
+    class Llama db;
+
+    %% Infrastructure Note
+    style STAGE_4 fill:#f8fafc,stroke:#334155,stroke-dasharray: 5 5;
+    classDef note fill:#fff,stroke:#334155;
+    
+    %% Direction Flow
+    direction TB

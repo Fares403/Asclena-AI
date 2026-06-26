@@ -1,0 +1,104 @@
+graph TD
+    %% Modern Minimal Light Theme Definitions
+    classDef layerTitle fill:#FFFFFF,stroke:#D1D5DB,stroke-width:1px,font-weight:bold,color:#1F2937;
+    classDef dataSource fill:#F0F7FF,stroke:#0076FF,stroke-width:1.5px,rx:8px,color:#1E3A8A;
+    classDef processing fill:#F9FAFB,stroke:#4B5563,stroke-width:1.5px,rx:8px,color:#1F2937;
+    classDef MLlayer fill:#F5F3FF,stroke:#7C3AED,stroke-width:1.5px,rx:8px,color:#4C1D95;
+    classDef ruleEngine fill:#FFF1F2,stroke:#E11D48,stroke-width:1.5px,rx:8px,color:#881337;
+    
+    %% Output Tier Custom Styles (Soft & Vibrant Light Accents)
+    classDef outputTier1 fill:#FEF2F2,stroke:#EF4444,stroke-width:2px,rx:6px,color:#991B1B,font-weight:bold;
+    classDef outputTier2 fill:#FFFAF0,stroke:#F97316,stroke-width:1.5px,rx:6px,color:#9A3412;
+    classDef outputTier3 fill:#FEFCE8,stroke:#CA8A04,stroke-width:1.5px,rx:6px,color:#713F12;
+    classDef outputTier4 fill:#F0FDF4,stroke:#16A34A,stroke-width:1.5px,rx:6px,color:#14532D;
+
+    %% 1. Raw Data Extraction Layer
+    subgraph Layer1 [1. Raw Data Extraction Layer]
+        T_Vitals["Triage Vitals<br/>(BP, HR, RR, Temp, SpO2)"]:::dataSource
+        C_Complaints["Chief Complaints (CC)<br/>(Unstructured Free-Text)"]:::dataSource
+        Demographics["Patient Demographics<br/>(Age, Sex, Weight)"]:::dataSource
+        ICD_History["ICD Diagnosis History<br/>(Comorbidities: CKD, CHF)"]:::dataSource
+        Lab_Orders["Lab Orders Tracker<br/>(Troponin, ABG Orders)"]:::dataSource
+        Meds["Medication Pulls<br/>(Pyxis Real-time ED Streams)"]:::dataSource
+    end
+    style Layer1 fill:#FAFAFA,stroke:#E5E7EB,stroke-width:1px;
+
+    %% 2. QA & Validation Layer
+    subgraph Layer2 [2. QA & Validation Layer]
+        QA_Engine{"14-Step Automated<br/>QA & Validation Check"}:::processing
+        Data_Completeness_Check["Assess Feature Sequence Completeness"]:::processing
+    end
+    style Layer2 fill:#FAFAFA,stroke:#E5E7EB,stroke-width:1px;
+
+    %% Connecting Extraction to QA
+    T_Vitals --> QA_Engine
+    C_Complaints --> QA_Engine
+    Demographics --> QA_Engine
+    ICD_History --> QA_Engine
+    Lab_Orders --> QA_Engine
+    Meds --> QA_Engine
+    QA_Engine --> Data_Completeness_Check
+
+    %% 3. Feature Generation & Fusion Layer
+    subgraph Layer3 [3. Feature Generation & Fusion Layer]
+        NLP_Parser["NLP Semantic Parser<br/>(Symptom Architecture)"]:::processing
+        Data_Fusion["Data Fusion Engine<br/>(67 Engineered Indicators)"]:::processing
+    end
+    style Layer3 fill:#FAFAFA,stroke:#E5E7EB,stroke-width:1px;
+
+    Data_Completeness_Check --> NLP_Parser
+    Data_Completeness_Check --> Data_Fusion
+    NLP_Parser --> Data_Fusion
+
+    %% Parallel Forking
+    Data_Fusion --> |Unified Math Vector| ML_Model
+    Data_Fusion --> |Real-time Physiological Stream| Signal_Detectors
+
+    %% 4. Machine Learning & Probability Calibration
+    subgraph Layer4 [4. Predictive Modeling Layer]
+        ML_Model["XGBoost ML Pipeline<br/>(Risk Probabilities)"]:::MLlayer
+        Calibration["Probability Calibration Layer<br/>(Calibrated Risk Score)"]:::MLlayer
+    end
+    style Layer4 fill:#FAFAFA,stroke:#E5E7EB,stroke-width:1px;
+    ML_Model --> Calibration
+
+    %% 5. Deterministic Clinical Signal Detectors
+    subgraph Layer5 [5. Safety & Threshold Layer]
+        Signal_Detectors{"Deterministic Rules Engine<br/>(Global Protocols: NEWS2 / qSOFA)"}:::ruleEngine
+        Resp_Comp["Respiratory Compromise<br/>(SpO2 < 95% or RR > 20)"]:::ruleEngine
+        Haemo_Inst["Haemodynamic Instability<br/>(Systolic BP < 100 or SI >= 0.9)"]:::ruleEngine
+        Det_Trend["Deterioration Trend<br/>(ΔHR > +1.0/h & ΔSBP < -1.0/h)"]:::ruleEngine
+        Data_Alert["Data Completeness Alert<br/>(Missing >= 3 Core Vitals)"]:::ruleEngine
+    end
+    style Layer5 fill:#FAFAFA,stroke:#E5E7EB,stroke-width:1px;
+
+    %% Link Rules
+    Signal_Detectors --> Resp_Comp
+    Signal_Detectors --> Haemo_Inst
+    Signal_Detectors --> Det_Trend
+    Signal_Detectors --> Data_Alert
+
+    %% Join Layers into Explainable Framework
+    Calibration --> Explainable_AI_Layer
+    Resp_Comp --> Explainable_AI_Layer
+    Haemo_Inst --> Explainable_AI_Layer
+    Det_Trend --> Explainable_AI_Layer
+    Data_Alert --> Explainable_AI_Layer
+
+    %% 6. Explainable Clinical Output Layer
+    subgraph Layer6 [6. Actionable Clinical Output Layer]
+        Explainable_AI_Layer["Asclena Explainable AI Synthesis<br/>(Translates Complex Risk Matrices)"]:::processing
+        
+        %% Asclena Severity Index (ASI) Tiers
+        ASI_1["🔴 ASI-1: Critical Risk (≥ 85%)<br/>Trigger Immediate Resuscitation Workflow"]:::outputTier1
+        ASI_2["🟠 ASI-2: Very High Risk (70% - 85%)<br/>Urgent Evaluation / Bypass Queue"]:::outputTier2
+        ASI_3_4["🟡 ASI-3 / ASI-4: Elevated Risk (40% - 70%)<br/>Continuous Screening & Mandatory Re-evaluation"]:::outputTier3
+        ASI_5_6["🟢 ASI-5 / ASI-6: Standard Risk (< 40%)<br/>Routine Clinical Triage Workflow"]:::outputTier4
+    end
+    style Layer6 fill:#FAFAFA,stroke:#E5E7EB,stroke-width:1px;
+
+    %% Final Routing
+    Explainable_AI_Layer --> ASI_1
+    Explainable_AI_Layer --> ASI_2
+    Explainable_AI_Layer --> ASI_3_4
+    Explainable_AI_Layer --> ASI_5_6

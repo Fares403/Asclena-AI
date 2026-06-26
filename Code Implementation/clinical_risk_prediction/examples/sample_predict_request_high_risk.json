@@ -10,7 +10,7 @@
     "gender_male": 1,
     "gender_female": 0,
     "gender_unknown": 0,
-    "triage_temperature": 99.1,
+    "triage_temperature": null,
     "triage_heartrate": 118,
     "triage_resprate": 24,
     "triage_o2sat": 90,
